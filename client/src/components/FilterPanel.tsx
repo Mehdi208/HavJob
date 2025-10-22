@@ -15,6 +15,7 @@ export type Filters = {
   categories: string[];
   locations: string[];
   isRemote: boolean | null;
+  isOnSite: boolean | null;
   isBoosted: boolean;
   searchQuery: string;
 };
@@ -29,6 +30,7 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [showRemote, setShowRemote] = useState(false);
+  const [showOnSite, setShowOnSite] = useState(false);
   const [showBoosted, setShowBoosted] = useState(false);
 
   const categories = [
@@ -73,6 +75,7 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
       categories: selectedCategories,
       locations: selectedLocations,
       isRemote: showRemote ? true : null,
+      isOnSite: showOnSite ? true : null,
       isBoosted: showBoosted,
       searchQuery: currentSearchQuery,
     });
@@ -83,12 +86,14 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
     setSelectedCategories([]);
     setSelectedLocations([]);
     setShowRemote(false);
+    setShowOnSite(false);
     setShowBoosted(false);
     onFiltersChange({
       budget: [0, 1000000],
       categories: [],
       locations: [],
       isRemote: null,
+      isOnSite: null,
       isBoosted: false,
       searchQuery: currentSearchQuery,
     });
@@ -207,7 +212,18 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
                     data-testid="checkbox-remote"
                   />
                   <Label htmlFor="remote-work" className="text-sm font-normal cursor-pointer">
-                    Travail à distance uniquement
+                    Travail à distance
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="onsite-work"
+                    checked={showOnSite}
+                    onCheckedChange={(checked) => setShowOnSite(checked as boolean)}
+                    data-testid="checkbox-onsite"
+                  />
+                  <Label htmlFor="onsite-work" className="text-sm font-normal cursor-pointer">
+                    Travail sur site
                   </Label>
                 </div>
               </div>

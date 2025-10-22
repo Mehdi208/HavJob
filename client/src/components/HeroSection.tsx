@@ -1,8 +1,33 @@
 import { Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { useLocation } from "wouter";
 
 export default function HeroSection() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [location, setSelectedLocation] = useState("");
+  const [, navigate] = useLocation();
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) {
+      params.append("search", searchQuery);
+    }
+    if (location) {
+      params.append("location", location);
+    }
+    const queryString = params.toString();
+    navigate(queryString ? `/missions?${queryString}` : "/missions");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden bg-gradient-to-br from-primary/10 via-sidebar-accent/10 to-chart-3/10">
       <div className="relative h-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col justify-center items-center text-center">
@@ -21,21 +46,32 @@ export default function HeroSection() {
                 type="search"
                 placeholder="Quel type de mission recherchez-vous ?"
                 className="pl-10 h-12 bg-card border-0 text-base shadow-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 data-testid="input-hero-search"
               />
             </div>
             <div className="relative md:w-64">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Ville"
-                className="pl-10 h-12 bg-card border-0 text-base shadow-sm"
-                data-testid="input-hero-location"
-              />
+              <Select value={location} onValueChange={setSelectedLocation}>
+                <SelectTrigger className="h-12 bg-card border-0 text-base shadow-sm" data-testid="select-hero-location">
+                  <MapPin className="h-5 w-5 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Ville" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Abidjan">Abidjan</SelectItem>
+                  <SelectItem value="Yamoussoukro">Yamoussoukro</SelectItem>
+                  <SelectItem value="Bouaké">Bouaké</SelectItem>
+                  <SelectItem value="San-Pédro">San-Pédro</SelectItem>
+                  <SelectItem value="Korhogo">Korhogo</SelectItem>
+                  <SelectItem value="Daloa">Daloa</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button
               size="lg"
               className="h-12 px-8 font-medium"
+              onClick={handleSearch}
               data-testid="button-hero-search"
             >
               Rechercher
@@ -45,12 +81,14 @@ export default function HeroSection() {
           <div className="flex flex-wrap gap-3 justify-center">
             <Button
               variant="default"
+              onClick={() => navigate("/publier")}
               data-testid="button-hero-publish"
             >
               Publier une mission
             </Button>
             <Button
               variant="outline"
+              onClick={() => navigate("/missions")}
               data-testid="button-hero-services"
             >
               Proposer mes services

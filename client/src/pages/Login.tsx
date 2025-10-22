@@ -27,13 +27,16 @@ export default function Login() {
     mutationFn: async (data: LoginCredentials) => {
       return await apiRequest("POST", "/api/auth/login", data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Connexion réussie",
         description: "Bienvenue sur HavJob !",
       });
-      setLocation("/");
+      setTimeout(() => {
+        setLocation("/");
+      }, 100);
     },
     onError: (error: any) => {
       toast({
@@ -52,7 +55,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">HavJob</CardTitle>
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-sidebar-accent to-primary bg-clip-text text-transparent">HavJob</CardTitle>
           <CardDescription>
             Connectez-vous à votre compte
           </CardDescription>

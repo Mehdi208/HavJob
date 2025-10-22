@@ -21,6 +21,7 @@ export default function Missions() {
     categories: [],
     locations: [],
     isRemote: null,
+    isOnSite: null,
     isBoosted: false,
     searchQuery: "",
   });
@@ -42,6 +43,9 @@ export default function Missions() {
     }
     if (filters.isRemote !== null) {
       params.append("isRemote", filters.isRemote.toString());
+    }
+    if (filters.isOnSite !== null) {
+      params.append("isOnSite", filters.isOnSite.toString());
     }
     if (filters.isBoosted) {
       params.append("isBoosted", "true");

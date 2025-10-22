@@ -3,14 +3,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Briefcase, AlertTriangle, TrendingUp } from "lucide-react";
+import { Users, Briefcase, AlertTriangle, TrendingUp, Lock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import type { Mission, User } from "@shared/schema";
+import { useEffect } from "react";
 
 export default function Admin() {
+  const [, setLocation] = useLocation();
+  
+  const { data: currentUser, isLoading: userLoading } = useQuery<User>({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+  
   const { data: missions = [] } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
   });
+
+  useEffect(() => {
+    if (!userLoading && !currentUser) {
+      setLocation("/login");
+    }
+  }, [currentUser, userLoading, setLocation]);
 
   const stats = [
     {
@@ -42,6 +57,39 @@ export default function Admin() {
       trendUp: true,
     },
   ];
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">Vérification des permissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-8 text-center">
+              <Lock className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h2 className="text-2xl font-bold mb-2">Accès restreint</h2>
+              <p className="text-muted-foreground mb-6">
+                Vous devez être connecté pour accéder à cette page.
+              </p>
+              <Button onClick={() => setLocation("/login")}>
+                Se connecter
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">

@@ -27,6 +27,7 @@ export interface IStorage {
     maxBudget?: number;
     location?: string;
     isRemote?: boolean;
+    isOnSite?: boolean;
     isBoosted?: boolean;
     status?: string;
     search?: string;
@@ -258,6 +259,7 @@ export class MemStorage implements IStorage {
     maxBudget?: number;
     location?: string;
     isRemote?: boolean;
+    isOnSite?: boolean;
     isBoosted?: boolean;
     status?: string;
     search?: string;
@@ -281,6 +283,10 @@ export class MemStorage implements IStorage {
       }
       if (filters.isRemote !== undefined) {
         missions = missions.filter((m) => m.isRemote === filters.isRemote);
+      }
+      if (filters.isOnSite !== undefined) {
+        // isOnSite filter: when true, show only missions that are NOT remote (i.e., on-site)
+        missions = missions.filter((m) => m.isRemote === !filters.isOnSite);
       }
       if (filters.isBoosted !== undefined) {
         missions = missions.filter((m) => m.isBoosted === filters.isBoosted);

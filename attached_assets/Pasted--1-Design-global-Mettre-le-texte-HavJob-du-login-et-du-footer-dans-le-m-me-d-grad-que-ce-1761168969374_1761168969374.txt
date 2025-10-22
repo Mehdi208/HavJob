@@ -1,0 +1,83 @@
+🎨 1️⃣ – Design global
+
+Mettre le texte "HavJob" du login et du footer dans le même dégradé que celui de la NavBar (cohérence visuelle).
+
+Supprimer la barre de recherche dans la NavBar.
+
+Ajouter les menus suivants et les center dans la NavBar :
+
+Accueil
+
+Publier une mission
+
+Trouver des missions
+
+🔑 2️⃣ – Connexion & Inscription
+
+Le système de connexion et d’inscription ne fonctionne pas correctement :
+Lorsqu’on se connecte ou qu’on s’inscrit, on reste sur la page de connexion (non redirigé).
+→ Corrige le problème pour que l’utilisateur soit bien reconnu comme connecté.
+
+Si tu as besoin des informations de Supabase (API, clés, identifiants) pour relier correctement la base de données et les sessions, précise-le afin que je te les fournisse.
+
+👤 3️⃣ – Gestion de l’état connecté
+
+Lorsqu’un utilisateur est connecté, les éléments suivants dans la NavBar doivent disparaître :
+
+Les 3 icônes situées avant le bouton “Publier une mission”
+
+Le bouton “Publier une mission” lui-même
+(Cela permet d’afficher une NavBar adaptée à l’état connecté.)
+
+🏠 4️⃣ – Section Accueil
+
+Les champs de recherche doivent être fonctionnels :
+
+“Quel type de mission recherchez-vous ?”
+
+“Ville”
+
+Bouton “Rechercher”
+✅ Ces éléments doivent rediriger automatiquement vers la section “Missions disponibles” et afficher les résultats correspondants selon ce que l’utilisateur a saisi dans la barre de recherche.
+
+Le bouton “Publier une mission” doit rediriger vers la page Publier une mission.
+
+Le bouton “Proposer mes services” doit rediriger vers la section Missions disponibles.
+
+🧩 5️⃣ – Section "Missions disponibles"
+
+Corriger les bugs suivants :
+
+Quand on tape une lettre dans la barre de recherche, la page remonte automatiquement vers le haut → corriger ce comportement.
+
+Quand on coche un filtre, la page remonte aussi vers le haut et le filtre ne reste pas coché → corriger.
+
+Dans les types de prestations, il faut uniquement :
+
+Travail à distance
+
+Travail sur site
+
+🔐 6️⃣ – Accès administrateur
+
+L’espace administrateur doit également être protégé par une connexion.
+
+Les identifiants et mots de passe de cet espace doivent être uniques et définis manuellement par moi-même.
+
+Assure-toi qu’un utilisateur non connecté ne puisse pas accéder à cet espace via l’URL.
+
+✅ Étape finale
+
+Une fois toutes ces modifications appliquées :
+
+Teste la redirection après connexion et inscription.
+
+Vérifie que les filtres et recherches sont bien fonctionnels sans rechargement intempestif.
+
+Confirme que les menus, boutons et couleurs respectent la cohérence globale du design HavJob.
+
+💬 Commande finale pour Replit Agent 3
+
+« Applique toutes les modifications ci-dessus dans l’ordre indiqué.
+Corrige les bugs de connexion, mets à jour la NavBar, rends les filtres et recherches fonctionnels, et protège l’espace administrateur selon les règles précisées.
+Demande-moi les identifiants Supabase si nécessaires pour finaliser la connexion. »

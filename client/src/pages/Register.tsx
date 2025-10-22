@@ -31,13 +31,16 @@ export default function Register() {
     mutationFn: async (data: InsertUser) => {
       return await apiRequest("POST", "/api/auth/register", data);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès !",
       });
-      setLocation("/");
+      setTimeout(() => {
+        setLocation("/");
+      }, 100);
     },
     onError: (error: any) => {
       toast({
@@ -56,7 +59,7 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">HavJob</CardTitle>
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-sidebar-accent to-primary bg-clip-text text-transparent">HavJob</CardTitle>
           <CardDescription>
             Créez votre compte pour commencer
           </CardDescription>
