@@ -74,6 +74,11 @@ export default function Footer() {
                   Conditions d'utilisation
                 </Link>
               </li>
+              <li>
+                <Link href="/admin" className="text-sm text-primary font-medium hover:text-primary/80" data-testid="link-admin-dashboard">
+                  Dashboard Admin
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
