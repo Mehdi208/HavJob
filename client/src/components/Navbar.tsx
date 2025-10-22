@@ -28,7 +28,7 @@ export default function Navbar() {
               data-testid="link-home"
               className="flex items-center gap-2"
             >
-              <img src={logoImage} alt="HavJob Logo" className="h-10 w-10" />
+              <img src={logoImage} alt="HavJob Logo" className="h-10 w-10 ml-[-10px] mr-[-10px]" />
               <h1 className="text-2xl font-bold text-primary">HavJob</h1>
             </Link>
 
