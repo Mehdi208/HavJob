@@ -57,10 +57,10 @@ export default function MissionCard({
       if (isFavorite) {
         const favorite = favorites.find(f => f.missionId === id);
         if (favorite) {
-          return await apiRequest(`/api/favorites/${favorite.id}`, "DELETE");
+          return await apiRequest("DELETE", `/api/favorites/${favorite.id}`);
         }
       } else {
-        return await apiRequest("/api/favorites", "POST", { missionId: id });
+        return await apiRequest("POST", "/api/favorites", { missionId: id });
       }
     },
     onSuccess: () => {

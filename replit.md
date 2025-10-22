@@ -29,11 +29,11 @@ Preferred communication style: Simple, everyday language.
 
 **Design System:**
 - Custom color palette with warm beige backgrounds (#F7EFE4) and deep blue text (#1E3A8A)
-- Primary actions use soft green (#81C784), secondary actions use teal (#1A93B8)
-- Boost features highlighted with red/bordeaux gradients
+- Primary actions use vibrant orange (#FF7043), secondary actions use teal (#1A93B8)
+- Boost features highlighted with animated yellow-red gradients
 - Inter font family for clean, professional UI elements
-- Custom border radius system (9px/6px/3px)
-- Nintendo-inspired warm aesthetic for approachable, friendly user experience
+- Semantic color tokens via CSS variables for consistent theming
+- Mobile-first, warm aesthetic for approachable, friendly user experience
 
 **State Management:**
 - React Query for asynchronous state (API data, caching, background updates)
@@ -56,26 +56,29 @@ Preferred communication style: Simple, everyday language.
 
 **Authentication Strategy:**
 - Manual login using phone number + password (email optional)
-- Password hashing using bcrypt (implied by security requirements)
-- Session management with PostgreSQL backing store
-- Role-based access control for freelancers and clients
+- Password hashing using bcrypt with salt rounds (10)
+- Session management with express-session (in-memory store for development)
+- Role-based access control for freelancers, clients, or both
 
 ### Database Architecture
 
+**Current State:**
+- In-memory storage (MemStorage) for development and testing
+- Data models defined in shared/schema.ts with full type safety
+- Ready for PostgreSQL migration when needed
+
 **ORM and Migrations:**
-- Drizzle ORM for type-safe queries and migrations
+- Drizzle ORM schemas prepared for type-safe queries and migrations
 - Schema defined in TypeScript (shared/schema.ts)
-- Migration files generated in ./migrations directory
-- Database URL configured via environment variables
+- Drizzle-Zod integration for runtime schema validation
 
 **Schema Design:**
-- Users table with username, password fields (UUID primary keys)
-- Extensible schema for missions, boosts, favorites, reviews, transactions, categories
-- PostgreSQL-specific features leveraged (gen_random_uuid())
-
-**Data Validation:**
-- Drizzle-Zod integration for runtime schema validation
-- Type inference from database schema to TypeScript types
+- Users: phoneNumber (unique), password (bcrypt hashed), fullName, email, role
+- Missions: title, description, category, budget, location, isRemote, status, boost info
+- Applications: freelancer applications to missions with cover letters
+- Favorites: users can save favorite missions
+- Reviews: ratings and feedback system
+- Boosts: paid visibility enhancement (1/3/7/15/30 days)
 
 ### External Dependencies
 

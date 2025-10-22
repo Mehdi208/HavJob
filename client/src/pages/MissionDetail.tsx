@@ -30,7 +30,7 @@ export default function MissionDetail() {
 
   const applyMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/missions/${params?.id}/apply`, "POST", {
+      return await apiRequest("POST", `/api/missions/${params?.id}/apply`, {
         coverLetter,
         missionId: params?.id,
       });

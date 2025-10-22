@@ -53,7 +53,7 @@ export default function PublishMission() {
 
   const publishMutation = useMutation({
     mutationFn: async (data: InsertMission) => {
-      return await apiRequest("/api/missions", "POST", data);
+      return await apiRequest("POST", "/api/missions", data);
     },
     onSuccess: () => {
       toast({
