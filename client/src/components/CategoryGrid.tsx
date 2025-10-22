@@ -26,12 +26,13 @@ export default function CategoryGrid() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map((category) => {
+          {categories.map((category, index) => {
             const Icon = category.icon;
             return (
               <Card
                 key={category.name}
-                className="p-6 hover-elevate active-elevate-2 cursor-pointer transition-all duration-200"
+                className="p-6 hover:scale-105 hover-elevate active-elevate-2 cursor-pointer transition-all duration-300 opacity-0 animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                 data-testid={`card-category-${category.name}`}
               >
                 <div className="flex flex-col items-center text-center gap-3">
