@@ -1,8 +1,9 @@
-import { Search, Plus, Menu, User, MessageSquare, Bell, X } from "lucide-react";
+import { Search, Plus, Menu, User, MessageSquare, Bell, X, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Link } from "wouter";
+import logoImage from "@assets/HavJob-Logo-Fond-Blanc_1761133588844.png";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,7 +14,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
           <div className="flex items-center gap-8">
-            <Link href="/" data-testid="link-home">
+            <Link href="/" data-testid="link-home" className="flex items-center gap-2">
+              <img src={logoImage} alt="HavJob Logo" className="h-10 w-10" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-sidebar-accent bg-clip-text text-transparent">
                 HavJob
               </h1>
@@ -35,6 +37,9 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <>
+                <Button variant="ghost" size="icon" data-testid="button-support">
+                  <HelpCircle className="h-5 w-5" />
+                </Button>
                 <Button variant="ghost" size="icon" data-testid="button-messages">
                   <MessageSquare className="h-5 w-5" />
                 </Button>
