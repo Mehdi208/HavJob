@@ -2,7 +2,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -10,31 +10,45 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-export default function FilterPanel() {
-  const [budget, setBudget] = useState([0, 1000000]);
+export type Filters = {
+  budget: [number, number];
+  categories: string[];
+  locations: string[];
+  isRemote: boolean | null;
+  isBoosted: boolean;
+  searchQuery: string;
+};
+
+type FilterPanelProps = {
+  onFiltersChange: (filters: Filters) => void;
+  currentSearchQuery?: string;
+};
+
+export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }: FilterPanelProps) {
+  const [budget, setBudget] = useState<[number, number]>([0, 1000000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [showRemote, setShowRemote] = useState(false);
   const [showBoosted, setShowBoosted] = useState(false);
 
   const categories = [
-    { name: "Développement", count: 124 },
-    { name: "Design", count: 89 },
-    { name: "Marketing", count: 67 },
-    { name: "Rédaction", count: 45 },
-    { name: "Vidéo", count: 34 },
-    { name: "Photographie", count: 28 },
+    { name: "Développement" },
+    { name: "Design" },
+    { name: "Marketing" },
+    { name: "Rédaction" },
+    { name: "Vidéo" },
+    { name: "Photographie" },
+    { name: "Services" },
+    { name: "Conseil" },
   ];
 
   const locations = [
-    { name: "Abidjan", count: 256 },
-    { name: "Yamoussoukro", count: 45 },
-    { name: "Bouaké", count: 38 },
-    { name: "San-Pédro", count: 24 },
-  ];
-
-  const types = [
-    { name: "Ponctuel", count: 178 },
-    { name: "Récurrent", count: 145 },
-    { name: "À distance", count: 89 },
+    { name: "Abidjan" },
+    { name: "Yamoussoukro" },
+    { name: "Bouaké" },
+    { name: "San-Pédro" },
+    { name: "Korhogo" },
+    { name: "Daloa" },
   ];
 
   const handleCategoryToggle = (category: string) => {
@@ -45,9 +59,39 @@ export default function FilterPanel() {
     );
   };
 
+  const handleLocationToggle = (location: string) => {
+    setSelectedLocations(prev =>
+      prev.includes(location)
+        ? prev.filter(l => l !== location)
+        : [...prev, location]
+    );
+  };
+
   const handleApplyFilters = () => {
-    //todo: remove mock functionality - Implement actual filter application
-    console.log("Applying filters:", { budget, selectedCategories, showBoosted });
+    onFiltersChange({
+      budget,
+      categories: selectedCategories,
+      locations: selectedLocations,
+      isRemote: showRemote ? true : null,
+      isBoosted: showBoosted,
+      searchQuery: currentSearchQuery,
+    });
+  };
+
+  const handleReset = () => {
+    setBudget([0, 1000000]);
+    setSelectedCategories([]);
+    setSelectedLocations([]);
+    setShowRemote(false);
+    setShowBoosted(false);
+    onFiltersChange({
+      budget: [0, 1000000],
+      categories: [],
+      locations: [],
+      isRemote: null,
+      isBoosted: false,
+      searchQuery: currentSearchQuery,
+    });
   };
 
   return (
@@ -58,11 +102,7 @@ export default function FilterPanel() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => {
-              setBudget([0, 1000000]);
-              setSelectedCategories([]);
-              setShowBoosted(false);
-            }}
+            onClick={handleReset}
             data-testid="button-reset-filters"
           >
             Réinitialiser
@@ -104,7 +144,6 @@ export default function FilterPanel() {
                         {category.name}
                       </Label>
                     </div>
-                    <span className="text-xs text-muted-foreground">({category.count})</span>
                   </div>
                 ))}
               </div>
@@ -120,7 +159,7 @@ export default function FilterPanel() {
                   max={1000000}
                   step={10000}
                   value={budget}
-                  onValueChange={setBudget}
+                  onValueChange={(value) => setBudget(value as [number, number])}
                   className="w-full"
                   data-testid="slider-budget"
                 />
@@ -137,17 +176,19 @@ export default function FilterPanel() {
             <AccordionContent>
               <div className="space-y-3">
                 {locations.map((location) => (
-                  <div key={location.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Checkbox id={`location-${location.name}`} data-testid={`checkbox-location-${location.name}`} />
-                      <Label
-                        htmlFor={`location-${location.name}`}
-                        className="text-sm font-normal cursor-pointer"
-                      >
-                        {location.name}
-                      </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({location.count})</span>
+                  <div key={location.name} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`location-${location.name}`}
+                      checked={selectedLocations.includes(location.name)}
+                      onCheckedChange={() => handleLocationToggle(location.name)}
+                      data-testid={`checkbox-location-${location.name}`}
+                    />
+                    <Label
+                      htmlFor={`location-${location.name}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {location.name}
+                    </Label>
                   </div>
                 ))}
               </div>
@@ -158,20 +199,17 @@ export default function FilterPanel() {
             <AccordionTrigger className="text-sm font-medium">Type de prestation</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3">
-                {types.map((type) => (
-                  <div key={type.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Checkbox id={`type-${type.name}`} data-testid={`checkbox-type-${type.name}`} />
-                      <Label
-                        htmlFor={`type-${type.name}`}
-                        className="text-sm font-normal cursor-pointer"
-                      >
-                        {type.name}
-                      </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({type.count})</span>
-                  </div>
-                ))}
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="remote-work"
+                    checked={showRemote}
+                    onCheckedChange={(checked) => setShowRemote(checked as boolean)}
+                    data-testid="checkbox-remote"
+                  />
+                  <Label htmlFor="remote-work" className="text-sm font-normal cursor-pointer">
+                    Travail à distance uniquement
+                  </Label>
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>

@@ -1,10 +1,7 @@
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import CategoryGrid from "@/components/CategoryGrid";
-import StatsSection from "@/components/StatsSection";
+import Footer from "@/components/Footer";
 import FilterPanel, { type Filters } from "@/components/FilterPanel";
 import MissionCard from "@/components/MissionCard";
-import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SlidersHorizontal, Search } from "lucide-react";
@@ -16,9 +13,9 @@ type MissionWithClient = Mission & {
   client?: User;
 };
 
-export default function Home() {
+export default function Missions() {
   const [showFilters, setShowFilters] = useState(false);
-  const [displayLimit, setDisplayLimit] = useState(6);
+  const [displayLimit, setDisplayLimit] = useState(12);
   const [filters, setFilters] = useState<Filters>({
     budget: [0, 1000000],
     categories: [],
@@ -98,19 +95,27 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <HeroSection />
-      <CategoryGrid />
-      <StatsSection />
 
+      <div className="bg-gradient-to-b from-primary/5 to-transparent py-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
+            Toutes les missions
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Trouvez la mission parfaite parmi {missions.length} opportunités
+          </p>
+        </div>
+      </div>
+      
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 flex-1">
         <div className="flex flex-col gap-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-foreground">
-                Missions disponibles
+                Résultats
               </h2>
               <p className="text-muted-foreground">
-                {missions.length} mission{missions.length > 1 ? 's' : ''} disponible{missions.length > 1 ? 's' : ''}
+                {missions.length} mission{missions.length > 1 ? 's' : ''} trouvée{missions.length > 1 ? 's' : ''}
               </p>
             </div>
             <Button
@@ -124,11 +129,11 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="relative max-w-2xl">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Rechercher une mission par titre ou description..."
+              placeholder="Rechercher une mission..."
               className="pl-10"
               value={filters.searchQuery}
               onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
@@ -145,7 +150,7 @@ export default function Home() {
           <div className="lg:col-span-3">
             {missions.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">Aucune mission disponible pour le moment</p>
+                <p className="text-muted-foreground">Aucune mission ne correspond à vos critères</p>
               </div>
             ) : (
               <>
@@ -172,7 +177,7 @@ export default function Home() {
                   <div className="mt-8 flex justify-center">
                     <Button
                       variant="outline"
-                      onClick={() => setDisplayLimit(prev => prev + 6)}
+                      onClick={() => setDisplayLimit(prev => prev + 12)}
                       data-testid="button-load-more"
                     >
                       Charger plus de missions ({missions.length - displayLimit} restantes)

@@ -110,6 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isRemote: req.query.isRemote === "true" ? true : req.query.isRemote === "false" ? false : undefined,
         isBoosted: req.query.isBoosted === "true" ? true : req.query.isBoosted === "false" ? false : undefined,
         status: req.query.status as string | undefined,
+        search: req.query.search as string | undefined,
       };
 
       const missions = await storage.getMissions(filters);

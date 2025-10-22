@@ -29,6 +29,7 @@ export interface IStorage {
     isRemote?: boolean;
     isBoosted?: boolean;
     status?: string;
+    search?: string;
   }): Promise<Mission[]>;
   createMission(mission: InsertMission & { clientId: string }): Promise<Mission>;
   updateMission(id: string, updates: Partial<Mission>): Promise<Mission | undefined>;
@@ -259,12 +260,14 @@ export class MemStorage implements IStorage {
     isRemote?: boolean;
     isBoosted?: boolean;
     status?: string;
+    search?: string;
   }): Promise<Mission[]> {
     let missions = Array.from(this.missions.values());
 
     if (filters) {
       if (filters.category) {
-        missions = missions.filter((m) => m.category === filters.category);
+        const categories = filters.category.split(",").map(c => c.trim());
+        missions = missions.filter((m) => categories.includes(m.category));
       }
       if (filters.minBudget !== undefined) {
         missions = missions.filter((m) => m.budget >= filters.minBudget!);
@@ -273,7 +276,8 @@ export class MemStorage implements IStorage {
         missions = missions.filter((m) => m.budget <= filters.maxBudget!);
       }
       if (filters.location) {
-        missions = missions.filter((m) => m.location === filters.location);
+        const locations = filters.location.split(",").map(l => l.trim());
+        missions = missions.filter((m) => m.location && locations.includes(m.location));
       }
       if (filters.isRemote !== undefined) {
         missions = missions.filter((m) => m.isRemote === filters.isRemote);
@@ -283,6 +287,13 @@ export class MemStorage implements IStorage {
       }
       if (filters.status) {
         missions = missions.filter((m) => m.status === filters.status);
+      }
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        missions = missions.filter((m) => 
+          m.title.toLowerCase().includes(searchLower) || 
+          m.description.toLowerCase().includes(searchLower)
+        );
       }
     }
 
