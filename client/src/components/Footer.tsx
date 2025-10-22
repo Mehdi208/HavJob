@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { Settings } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -9,9 +10,16 @@ export default function Footer() {
             <h3 className="text-xl font-bold text-primary mb-4">
               HavJob
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-3">
               La plateforme qui connecte freelances et entreprises en Côte d'Ivoire
             </p>
+            <Link 
+              href="/admin" 
+              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors" 
+              data-testid="link-admin-dashboard"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
           </div>
 
           <div>
@@ -72,11 +80,6 @@ export default function Footer() {
               <li>
                 <Link href="/cgu" className="text-sm text-muted-foreground hover:text-sidebar-accent">
                   Conditions d'utilisation
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin" className="text-sm text-primary font-medium hover:text-primary/80" data-testid="link-admin-dashboard">
-                  Dashboard Admin
                 </Link>
               </li>
             </ul>

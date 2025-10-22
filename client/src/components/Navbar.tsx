@@ -29,7 +29,7 @@ export default function Navbar() {
               className="flex items-center gap-2"
             >
               <img src={logoImage} alt="HavJob Logo" className="h-10 w-10 ml-[-10px] mr-[-10px]" />
-              <h1 className="text-2xl font-bold text-primary">HavJob</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-sidebar-accent to-primary bg-clip-text text-transparent">HavJob</h1>
             </Link>
 
             <div className="hidden md:flex items-center gap-2 max-w-2xl flex-1">
