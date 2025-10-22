@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertMissionSchema, insertApplicationSchema, insertReviewSchema, loginSchema } from "@shared/schema";
 import { z } from "zod";
+import bcrypt from "bcrypt";
 import "./types";
 
 // Middleware to check if user is authenticated
@@ -25,8 +26,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).send({ error: "Ce numéro de téléphone est déjà utilisé" });
       }
 
-      // TODO: Hash password with bcrypt
-      const user = await storage.createUser(validatedData);
+      // Hash password with bcrypt
+      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+      const user = await storage.createUser({
+        ...validatedData,
+        password: hashedPassword,
+      });
       
       // Create session
       req.session.userId = user.id;
@@ -52,8 +57,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).send({ error: "Numéro de téléphone ou mot de passe incorrect" });
       }
 
-      // TODO: Compare with hashed password using bcrypt
-      if (user.password !== password) {
+      // Compare with hashed password using bcrypt
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
         return res.status(401).send({ error: "Numéro de téléphone ou mot de passe incorrect" });
       }
 

@@ -8,82 +8,47 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { Mission, User } from "@shared/schema";
+
+type MissionWithClient = Mission & {
+  client?: User;
+};
 
 export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
 
-  //todo: remove mock functionality
-  const missions = [
-    {
-      id: "1",
-      title: "Développement d'une application mobile e-commerce",
-      description: "Je recherche un développeur expérimenté pour créer une application mobile iOS et Android pour ma boutique en ligne.",
-      budget: "500 000 FCFA",
-      category: "Développement",
-      location: "Abidjan",
-      postedTime: "Il y a 2h",
-      clientName: "Kouassi Jean",
-      applicantsCount: 12,
-      isBoosted: true,
-    },
-    {
-      id: "2",
-      title: "Design de logo et identité visuelle",
-      description: "Besoin d'un graphiste créatif pour concevoir un logo moderne et une charte graphique complète.",
-      budget: "150 000 FCFA",
-      category: "Design",
-      location: "Yamoussoukro",
-      postedTime: "Il y a 5h",
-      clientName: "Diabaté Awa",
-      applicantsCount: 8,
-      isRemote: true,
-    },
-    {
-      id: "3",
-      title: "Rédaction de contenu web SEO",
-      description: "Recherche rédacteur web pour créer du contenu optimisé SEO pour mon site internet.",
-      budget: "80 000 FCFA",
-      category: "Rédaction",
-      location: "Bouaké",
-      postedTime: "Il y a 1 jour",
-      clientName: "Koné Ibrahim",
-      applicantsCount: 5,
-    },
-    {
-      id: "4",
-      title: "Montage vidéo pour campagne marketing",
-      description: "Besoin d'un monteur vidéo professionnel pour créer des contenus engageants.",
-      budget: "200 000 FCFA",
-      category: "Vidéo",
-      location: "Abidjan",
-      postedTime: "Il y a 3h",
-      clientName: "Yao Marie",
-      applicantsCount: 15,
-      isBoosted: true,
-    },
-    {
-      id: "5",
-      title: "Création site web vitrine responsive",
-      description: "Site web moderne pour une entreprise de services avec 5-7 pages.",
-      budget: "350 000 FCFA",
-      category: "Développement",
-      location: "San-Pédro",
-      postedTime: "Il y a 8h",
-      clientName: "Traoré Bakary",
-      applicantsCount: 20,
-    },
-    {
-      id: "6",
-      title: "Photographie produits e-commerce",
-      description: "Shooting photo professionnel pour 50 produits avec retouche.",
-      budget: "120 000 FCFA",
-      category: "Photographie",
-      location: "Abidjan",
-      postedTime: "Il y a 6h",
-      clientName: "N'Guessan Sophie",
-      applicantsCount: 7,
-    },
-  ];
+  const { data: missions = [], isLoading } = useQuery<MissionWithClient[]>({
+    queryKey: ["/api/missions"],
+  });
+
+  const formatBudget = (budget: number) => {
+    return new Intl.NumberFormat("fr-FR").format(budget) + " FCFA";
+  };
+
+  const formatTimeAgo = (date: Date | string) => {
+    const now = new Date();
+    const missionDate = new Date(date);
+    const diffMs = now.getTime() - missionDate.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 1) return "Il y a quelques minutes";
+    if (diffHours < 24) return `Il y a ${diffHours}h`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return "Il y a 1 jour";
+    return `Il y a ${diffDays} jours`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">Chargement des missions...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -99,7 +64,7 @@ export default function Home() {
               Missions disponibles
             </h2>
             <p className="text-muted-foreground">
-              1,120 missions correspondent à votre recherche
+              {missions.length} mission{missions.length > 1 ? 's' : ''} disponible{missions.length > 1 ? 's' : ''}
             </p>
           </div>
           <Button
@@ -119,11 +84,30 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {missions.map((mission) => (
-                <MissionCard key={mission.id} {...mission} />
-              ))}
-            </div>
+            {missions.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Aucune mission disponible pour le moment</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {missions.map((mission) => (
+                  <MissionCard
+                    key={mission.id}
+                    id={mission.id}
+                    title={mission.title}
+                    description={mission.description}
+                    budget={formatBudget(mission.budget)}
+                    category={mission.category}
+                    location={mission.location || "Non spécifié"}
+                    postedTime={formatTimeAgo(mission.createdAt)}
+                    clientName="Client HavJob"
+                    applicantsCount={mission.applicantsCount || 0}
+                    isBoosted={mission.isBoosted || false}
+                    isRemote={mission.isRemote || false}
+                  />
+                ))}
+              </div>
+            )}
 
             <div className="mt-8 flex justify-center">
               <Button variant="outline" data-testid="button-load-more">

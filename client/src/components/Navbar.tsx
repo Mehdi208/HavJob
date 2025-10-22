@@ -7,16 +7,59 @@ import {
   Bell,
   X,
   HelpCircle,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import logoImage from "@assets/HavJob-Logo-Sans-Fond.png";
+import type { User as UserType } from "@shared/schema";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); //todo: remove mock functionality
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const { data: currentUser } = useQuery<UserType>({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/auth/logout", "POST");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+      toast({
+        title: "Déconnexion réussie",
+        description: "À bientôt sur HavJob !",
+      });
+      setLocation("/");
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de se déconnecter",
+      });
+    },
+  });
+
+  const isAuthenticated = !!currentUser;
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -69,30 +112,58 @@ export default function Navbar() {
                 >
                   <Bell className="h-5 w-5" />
                 </Button>
-                <Button
-                  variant="default"
-                  className="gap-2"
-                  data-testid="button-publish"
-                >
-                  <Plus className="h-4 w-4" />
-                  Publier une mission
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  data-testid="button-profile"
-                >
-                  <User className="h-5 w-5" />
-                </Button>
+                <Link href="/publier">
+                  <Button
+                    variant="default"
+                    className="gap-2"
+                    data-testid="button-publish"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Publier une mission
+                  </Button>
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid="button-profile"
+                    >
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>
+                      {currentUser.fullName}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link href="/dashboard">
+                      <DropdownMenuItem data-testid="menu-dashboard">
+                        Mon dashboard
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem 
+                      onClick={() => logoutMutation.mutate()}
+                      data-testid="menu-logout"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Se déconnecter
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>
-                <Button variant="ghost" data-testid="button-login">
-                  Connexion
-                </Button>
-                <Button variant="default" data-testid="button-signup">
-                  S'inscrire
-                </Button>
+                <Link href="/login">
+                  <Button variant="ghost" data-testid="button-login">
+                    Connexion
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="default" data-testid="button-signup">
+                    S'inscrire
+                  </Button>
+                </Link>
               </>
             )}
           </div>
@@ -125,38 +196,58 @@ export default function Navbar() {
             </div>
             {isAuthenticated ? (
               <div className="flex flex-col gap-2">
-                <Button
-                  variant="default"
-                  className="w-full gap-2"
-                  data-testid="button-publish-mobile"
-                >
-                  <Plus className="h-4 w-4" />
-                  Publier une mission
-                </Button>
+                <Link href="/publier">
+                  <Button
+                    variant="default"
+                    className="w-full gap-2"
+                    data-testid="button-publish-mobile"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Publier une mission
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    data-testid="button-profile-mobile"
+                  >
+                    Mon profil
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="w-full"
-                  data-testid="button-profile-mobile"
+                  onClick={() => {
+                    logoutMutation.mutate();
+                    setMobileMenuOpen(false);
+                  }}
+                  data-testid="button-logout-mobile"
                 >
-                  Mon profil
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Se déconnecter
                 </Button>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  data-testid="button-login-mobile"
-                >
-                  Connexion
-                </Button>
-                <Button
-                  variant="default"
-                  className="w-full"
-                  data-testid="button-signup-mobile"
-                >
-                  S'inscrire
-                </Button>
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    data-testid="button-login-mobile"
+                  >
+                    Connexion
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button
+                    variant="default"
+                    className="w-full"
+                    data-testid="button-signup-mobile"
+                  >
+                    S'inscrire
+                  </Button>
+                </Link>
               </div>
             )}
           </div>

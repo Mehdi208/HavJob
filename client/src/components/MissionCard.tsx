@@ -3,7 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useLocation } from "wouter";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import type { User } from "@shared/schema";
 
 interface MissionCardProps {
   id: string;
@@ -34,15 +38,70 @@ export default function MissionCard({
   isBoosted = false,
   isRemote = false,
 }: MissionCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const { data: currentUser } = useQuery<User>({
+    queryKey: ["/api/auth/me"],
+  });
+
+  const { data: favorites = [] } = useQuery<any[]>({
+    queryKey: ["/api/favorites"],
+    enabled: !!currentUser,
+  });
+
+  const isFavorite = favorites.some(f => f.missionId === id);
+
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      if (isFavorite) {
+        const favorite = favorites.find(f => f.missionId === id);
+        if (favorite) {
+          return await apiRequest(`/api/favorites/${favorite.id}`, "DELETE");
+        }
+      } else {
+        return await apiRequest("/api/favorites", "POST", { missionId: id });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+      toast({
+        title: isFavorite ? "Retiré des favoris" : "Ajouté aux favoris",
+        description: isFavorite ? "Mission retirée de vos favoris" : "Mission ajoutée à vos favoris",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue",
+      });
+    },
+  });
+
+  const handleCardClick = () => {
+    setLocation(`/missions/${id}`);
+  };
 
   return (
-    <Card className="relative overflow-hidden hover:scale-105 hover-elevate active-elevate-2 transition-all duration-300 p-6" data-testid={`card-mission-${id}`}>
+    <Card 
+      className="relative overflow-hidden hover:scale-105 hover-elevate active-elevate-2 transition-all duration-300 p-6 cursor-pointer" 
+      onClick={handleCardClick}
+      data-testid={`card-mission-${id}`}
+    >
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 left-2 h-8 w-8 z-10 mt-[0px] mb-[0px] pt-[0px] pb-[0px] pl-[0px] pr-[0px] ml-[315px] mr-[315px]"
-        onClick={() => setIsFavorite(!isFavorite)}
+        className="absolute top-2 left-2 h-8 w-8 z-10"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!currentUser) {
+            setLocation("/login");
+          } else {
+            toggleFavoriteMutation.mutate();
+          }
+        }}
+        disabled={toggleFavoriteMutation.isPending}
         data-testid={`button-favorite-${id}`}
       >
         <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground"}`} />
