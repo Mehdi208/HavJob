@@ -37,33 +37,22 @@ export default function MissionCard({
   const [isFavorite, setIsFavorite] = useState(false);
 
   return (
-    <Card className="relative overflow-visible hover:scale-105 hover-elevate active-elevate-2 transition-all duration-300 p-6" data-testid={`card-mission-${id}`}>
-      {isBoosted ? (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-[130px] h-8 w-8 z-20"
-            onClick={() => setIsFavorite(!isFavorite)}
-            data-testid={`button-favorite-${id}`}
-          >
-            <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-sidebar-accent"}`} />
-          </Button>
-          <div className="absolute top-0 right-0 bg-gradient-to-r from-[hsl(var(--chart-4))] via-[hsl(var(--chart-5))] to-[hsl(var(--destructive))] text-destructive-foreground px-4 py-2 rounded-bl-xl text-sm font-semibold flex items-center gap-1.5 shadow-lg animate-pulse z-10">
-            <Zap className="h-4 w-4" />
-            Boost actif
-          </div>
-        </>
-      ) : (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 h-8 w-8 z-20"
-          onClick={() => setIsFavorite(!isFavorite)}
-          data-testid={`button-favorite-${id}`}
-        >
-          <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-sidebar-accent"}`} />
-        </Button>
+    <Card className="relative overflow-hidden hover:scale-105 hover-elevate active-elevate-2 transition-all duration-300 p-6" data-testid={`card-mission-${id}`}>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-2 left-2 h-8 w-8 z-10"
+        onClick={() => setIsFavorite(!isFavorite)}
+        data-testid={`button-favorite-${id}`}
+      >
+        <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+      </Button>
+
+      {isBoosted && (
+        <div className="absolute top-0 right-0 bg-gradient-to-r from-[hsl(var(--chart-4))] via-[hsl(var(--chart-5))] to-[hsl(var(--destructive))] text-destructive-foreground px-4 py-2 rounded-bl-xl text-sm font-semibold flex items-center gap-1.5 shadow-lg animate-pulse">
+          <Zap className="h-4 w-4" />
+          Boost actif
+        </div>
       )}
 
       <div className="mt-2">
