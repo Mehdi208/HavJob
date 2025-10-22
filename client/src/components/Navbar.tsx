@@ -1,9 +1,18 @@
-import { Search, Plus, Menu, User, MessageSquare, Bell, X, HelpCircle } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Menu,
+  User,
+  MessageSquare,
+  Bell,
+  X,
+  HelpCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Link } from "wouter";
-import logoImage from "@assets/HavJob-Logo-Fond-Blanc_1761133588844.png";
+import logoImage from "@assets/HavJob-Logo-Sans-Fond.png";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,11 +23,13 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
           <div className="flex items-center gap-8">
-            <Link href="/" data-testid="link-home" className="flex items-center gap-2">
+            <Link
+              href="/"
+              data-testid="link-home"
+              className="flex items-center gap-2"
+            >
               <img src={logoImage} alt="HavJob Logo" className="h-10 w-10" />
-              <h1 className="text-2xl font-bold text-primary">
-                HavJob
-              </h1>
+              <h1 className="text-2xl font-bold text-primary">HavJob</h1>
             </Link>
 
             <div className="hidden md:flex items-center gap-2 max-w-2xl flex-1">
@@ -37,20 +48,40 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <>
-                <Button variant="ghost" size="icon" data-testid="button-support">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  data-testid="button-support"
+                >
                   <HelpCircle className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" data-testid="button-messages">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  data-testid="button-messages"
+                >
                   <MessageSquare className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" data-testid="button-notifications">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  data-testid="button-notifications"
+                >
                   <Bell className="h-5 w-5" />
                 </Button>
-                <Button variant="default" className="gap-2" data-testid="button-publish">
+                <Button
+                  variant="default"
+                  className="gap-2"
+                  data-testid="button-publish"
+                >
                   <Plus className="h-4 w-4" />
                   Publier une mission
                 </Button>
-                <Button variant="ghost" size="icon" data-testid="button-profile">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  data-testid="button-profile"
+                >
                   <User className="h-5 w-5" />
                 </Button>
               </>
@@ -73,7 +104,11 @@ export default function Navbar() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             data-testid="button-menu"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
         </div>
 
@@ -90,20 +125,36 @@ export default function Navbar() {
             </div>
             {isAuthenticated ? (
               <div className="flex flex-col gap-2">
-                <Button variant="default" className="w-full gap-2" data-testid="button-publish-mobile">
+                <Button
+                  variant="default"
+                  className="w-full gap-2"
+                  data-testid="button-publish-mobile"
+                >
                   <Plus className="h-4 w-4" />
                   Publier une mission
                 </Button>
-                <Button variant="outline" className="w-full" data-testid="button-profile-mobile">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-profile-mobile"
+                >
                   Mon profil
                 </Button>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <Button variant="outline" className="w-full" data-testid="button-login-mobile">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-login-mobile"
+                >
                   Connexion
                 </Button>
-                <Button variant="default" className="w-full" data-testid="button-signup-mobile">
+                <Button
+                  variant="default"
+                  className="w-full"
+                  data-testid="button-signup-mobile"
+                >
                   S'inscrire
                 </Button>
               </div>
