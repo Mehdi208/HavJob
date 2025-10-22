@@ -100,7 +100,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   phoneNumber: z.string().min(8, "Numéro de téléphone invalide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   fullName: z.string().min(2, "Le nom complet est requis"),
-  email: z.string().email("Email invalide").optional().or(z.literal("")),
+  email: z.union([z.string().email("Email invalide"), z.literal("")]).optional(),
 });
 
 export const insertMissionSchema = createInsertSchema(missions).omit({

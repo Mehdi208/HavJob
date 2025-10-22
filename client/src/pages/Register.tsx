@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { Phone, Lock, User, Mail } from "lucide-react";
@@ -32,6 +32,7 @@ export default function Register() {
       return await apiRequest("POST", "/api/auth/register", data);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès !",

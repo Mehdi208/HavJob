@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginCredentials } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { Phone, Lock } from "lucide-react";
@@ -28,6 +28,7 @@ export default function Login() {
       return await apiRequest("POST", "/api/auth/login", data);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Connexion réussie",
         description: "Bienvenue sur HavJob !",
