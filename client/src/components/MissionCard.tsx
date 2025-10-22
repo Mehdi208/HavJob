@@ -41,11 +41,11 @@ export default function MissionCard({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 left-2 h-8 w-8 z-10"
+        className="absolute top-2 right-2 h-8 w-8 z-10"
         onClick={() => setIsFavorite(!isFavorite)}
         data-testid={`button-favorite-${id}`}
       >
-        <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+        <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-sidebar-accent"}`} />
       </Button>
 
       {isBoosted && (
