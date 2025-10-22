@@ -13,6 +13,7 @@ import {
 export default function FilterPanel() {
   const [budget, setBudget] = useState([0, 1000000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [showBoosted, setShowBoosted] = useState(false);
 
   const categories = [
     { name: "Développement", count: 124 },
@@ -44,6 +45,11 @@ export default function FilterPanel() {
     );
   };
 
+  const handleApplyFilters = () => {
+    //todo: remove mock functionality - Implement actual filter application
+    console.log("Applying filters:", { budget, selectedCategories, showBoosted });
+  };
+
   return (
     <div className="sticky top-24 h-fit">
       <div className="bg-card border border-card-border rounded-xl p-6">
@@ -55,11 +61,26 @@ export default function FilterPanel() {
             onClick={() => {
               setBudget([0, 1000000]);
               setSelectedCategories([]);
+              setShowBoosted(false);
             }}
             data-testid="button-reset-filters"
           >
             Réinitialiser
           </Button>
+        </div>
+
+        <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="boosted-filter"
+              checked={showBoosted}
+              onCheckedChange={(checked) => setShowBoosted(checked as boolean)}
+              data-testid="checkbox-boosted"
+            />
+            <Label htmlFor="boosted-filter" className="text-sm font-medium cursor-pointer">
+              Afficher uniquement les missions boostées
+            </Label>
+          </div>
         </div>
 
         <Accordion type="multiple" defaultValue={["category", "budget", "location", "type"]} className="w-full">
@@ -155,6 +176,17 @@ export default function FilterPanel() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        <div className="mt-4">
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={handleApplyFilters}
+            data-testid="button-apply-filters"
+          >
+            Appliquer les filtres
+          </Button>
+        </div>
       </div>
     </div>
   );
