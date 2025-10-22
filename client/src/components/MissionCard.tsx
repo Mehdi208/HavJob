@@ -41,7 +41,7 @@ export default function MissionCard({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 left-2 h-8 w-8 z-10"
+        className="absolute top-2 left-2 h-8 w-8 z-10 mt-[0px] mb-[0px] pt-[0px] pb-[0px] pl-[0px] pr-[0px] ml-[315px] mr-[315px]"
         onClick={() => setIsFavorite(!isFavorite)}
         data-testid={`button-favorite-${id}`}
       >
