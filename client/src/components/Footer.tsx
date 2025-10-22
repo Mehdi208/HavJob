@@ -7,15 +7,14 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-primary mb-4">
-              HavJob
-            </h3>
+            <h3 className="text-xl font-bold text-primary mb-4">HavJob</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              La plateforme qui connecte freelances et entreprises en Côte d'Ivoire
+              La plateforme qui connecte freelances et entreprises en Côte
+              d'Ivoire
             </p>
-            <Link 
-              href="/admin" 
-              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors" 
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
               data-testid="link-admin-dashboard"
             >
               <Settings className="h-4 w-4" />
@@ -23,20 +22,31 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Pour les clients</h4>
+            <h4 className="font-semibold text-foreground mb-4">
+              Pour les clients
+            </h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/publier" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/publier"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Publier une mission
                 </Link>
               </li>
               <li>
-                <Link href="/freelances" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/freelances"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Trouver un freelance
                 </Link>
               </li>
               <li>
-                <Link href="/comment-ca-marche" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/comment-ca-marche"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Comment ça marche
                 </Link>
               </li>
@@ -44,20 +54,31 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Pour les freelances</h4>
+            <h4 className="font-semibold text-foreground mb-4">
+              Pour les freelances
+            </h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/missions" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/missions"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Trouver des missions
                 </Link>
               </li>
               <li>
-                <Link href="/devenir-freelance" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/devenir-freelance"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Devenir freelance
                 </Link>
               </li>
               <li>
-                <Link href="/boost" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/boost"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Booster mon profil
                 </Link>
               </li>
@@ -68,17 +89,26 @@ export default function Footer() {
             <h4 className="font-semibold text-foreground mb-4">Support</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/aide" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/aide"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Centre d'aide
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/contact"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Nous contacter
                 </Link>
               </li>
               <li>
-                <Link href="/cgu" className="text-sm text-muted-foreground hover:text-sidebar-accent">
+                <Link
+                  href="/cgu"
+                  className="text-sm text-muted-foreground hover:text-sidebar-accent"
+                >
                   Conditions d'utilisation
                 </Link>
               </li>
@@ -88,7 +118,7 @@ export default function Footer() {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 HavJob. Tous droits réservés. Made with ❤️ in Côte d'Ivoire
+            © 2025 HavJob. Tous droits réservés. Propulsé par Méhdi Traoré
           </p>
         </div>
       </div>
