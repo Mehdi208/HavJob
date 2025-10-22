@@ -17,28 +17,29 @@ Drawing inspiration from successful freelance platforms (Upwork, Fiverr, Freelan
 ## Color System
 
 ### Primary Palette (Light Mode)
-- **Primary Action:** #FF7043 (Coral Orange) - All primary buttons, active states, mission boost badges
+- **Primary Action:** #81C784 (Soft Green) - All primary buttons, active states, CTAs
 - **Primary Text:** #1E3A8A (Deep Blue) - Headings, important text, navigation
 - **Secondary Action:** #1A93B8 (Teal Blue) - Links, secondary buttons, icons, hover states
-- **Success/Active:** #81C784 (Soft Green) - Completed missions, success messages, availability indicators
-- **Neutral Grays:** 
-  - Background: 248 250 252 (slate-50)
-  - Cards: 255 255 255 (white)
-  - Borders: 226 232 240 (slate-200)
-  - Muted Text: 100 116 139 (slate-500)
+- **Boost Badges:** Red/Bordeaux Gradient - Mission boost indicators, premium features
+- **Warm Neutrals:** 
+  - Background: #F7EFE4 (Warm Beige) - Main page background
+  - Cards: #FFFFFF (White) - Card backgrounds
+  - Borders: Subtle beige tones
+  - Muted Text: Warm gray variations
 
 ### Dark Mode Palette
-- **Background:** 15 23 42 (slate-900)
-- **Cards:** 30 41 59 (slate-800)
-- **Primary Action:** #FF8A65 (lighter coral for contrast)
-- **Text:** 248 250 252 (slate-50)
-- **Borders:** 51 65 85 (slate-700)
+- **Background:** Dark beige/brown tones
+- **Cards:** Slightly lighter than background
+- **Primary Action:** #81C784 (Soft Green) - Maintained for consistency
+- **Text:** Light beige/cream tones
+- **Borders:** Subtle dark beige tones
 
 ### Accent Usage
-- Orange (#FF7043): Primary CTAs, "Publier une mission", boost badges, price highlights
+- Green (#81C784): Primary CTAs, "Publier une mission", success states, availability indicators
 - Teal (#1A93B8): Secondary actions, "Contacter via WhatsApp", profile links, filter active states
-- Green (#81C784): Mission completed status, availability badges, success notifications
-- Avoid using all colors equally - Orange dominates CTAs, Teal for navigation/links, Green sparingly for positive states
+- Red/Bordeaux: Boost badges exclusively, premium features, urgent notifications
+- Deep Blue (#1E3A8A): Text and headings for strong contrast against beige background
+- Nintendo-inspired aesthetic: Warm beige background creates approachable, friendly feel for Ivorian market
 
 ---
 
@@ -59,11 +60,11 @@ Drawing inspiration from successful freelance platforms (Upwork, Fiverr, Freelan
 - Tiny/Labels: text-xs (12px)
 
 **Hierarchy:**
-- Mission titles: font-semibold text-lg text-slate-900
+- Mission titles: font-semibold text-lg text-foreground (deep blue)
 - User names: font-medium text-base
-- Descriptions: font-normal text-slate-600
-- Budget/Price: font-bold text-xl text-primary (Orange)
-- Category tags: font-medium text-sm text-teal-700
+- Descriptions: font-normal text-muted-foreground
+- Budget/Price: font-bold text-xl text-primary (green)
+- Category tags: font-medium text-sm
 
 ---
 
@@ -138,16 +139,16 @@ Wide: xl: (1280px)
 - Error states: border-red-500 with text-red-600 message below
 
 ### Buttons
-- Primary: bg-primary text-white rounded-lg px-6 py-3 font-medium hover:bg-primary/90
-- Secondary: bg-teal-600 text-white (for WhatsApp, secondary actions)
-- Outline: border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50
-- Text/Link: text-teal-600 hover:text-teal-700 underline-offset-4 hover:underline
+- Primary: bg-primary (green #81C784) text-white rounded-lg px-6 py-3 font-medium hover:bg-primary/90
+- Secondary: bg-sidebar-accent (teal #1A93B8) text-white (for WhatsApp, secondary actions)
+- Outline: border-2 border-border bg-card text-foreground hover:bg-muted
+- Text/Link: text-sidebar-accent hover:text-sidebar-accent/80 underline-offset-4 hover:underline
 
 ### Boost Badges
-- Gradient background: bg-gradient-to-r from-orange-500 to-pink-500
-- Icon + text: "🚀 Boost actif - 3 jours restants"
-- Positioned absolutely on cards/profiles
-- Pulsing animation (subtle)
+- Gradient background: Red to bordeaux gradient (from-red-500 via-rose-500 to-pink-500)
+- Icon + text: "⚡ Boost actif"
+- Positioned absolutely on cards/profiles top-right
+- Pulsing animation for attention
 
 ### Rating Display
 - Star icons (filled/half/empty) in gold (#F59E0B)
@@ -206,7 +207,7 @@ Use sparingly - only where they enhance UX:
 Large hero image showcasing Ivorian professionals at work (diverse fields: tech, design, construction, services). Optimistic, authentic photography with warm lighting. Image should convey collaboration and opportunity.
 
 ### Category Icons
-Use Lucide icons for categories (Code, Palette, Hammer, Camera, etc.) with orange background circles
+Use Lucide icons for categories (Code, Palette, Hammer, Camera, etc.) with colored background circles matching category theme
 
 ### User Avatars
 Placeholder: Colored initials on gradient backgrounds when no photo uploaded

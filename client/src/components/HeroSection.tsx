@@ -35,7 +35,7 @@ export default function HeroSection() {
             </div>
             <Button
               size="lg"
-              className="h-12 px-8 bg-primary hover:bg-primary/90 text-white font-medium"
+              className="h-12 px-8 font-medium"
               data-testid="button-hero-search"
             >
               Rechercher
@@ -45,7 +45,6 @@ export default function HeroSection() {
           <div className="flex flex-wrap gap-3 justify-center">
             <Button
               variant="default"
-              className="bg-chart-3 hover:bg-chart-3/90 text-white"
               data-testid="button-hero-publish"
             >
               Publier une mission

@@ -2,14 +2,14 @@ import { Code, Palette, Megaphone, PenTool, Video, Camera, Wrench, Users } from 
 import { Card } from "@/components/ui/card";
 
 const categories = [
-  { name: "Développement", icon: Code, count: 124, color: "text-blue-500" },
-  { name: "Design", icon: Palette, count: 89, color: "text-purple-500" },
-  { name: "Marketing", icon: Megaphone, count: 67, color: "text-pink-500" },
-  { name: "Rédaction", icon: PenTool, count: 45, color: "text-green-500" },
-  { name: "Vidéo", icon: Video, count: 34, color: "text-red-500" },
-  { name: "Photographie", icon: Camera, count: 28, color: "text-yellow-500" },
-  { name: "Services", icon: Wrench, count: 56, color: "text-orange-500" },
-  { name: "Conseil", icon: Users, count: 41, color: "text-teal-500" },
+  { name: "Développement", icon: Code, count: 124, color: "text-chart-3" },
+  { name: "Design", icon: Palette, count: 89, color: "text-primary" },
+  { name: "Marketing", icon: Megaphone, count: 67, color: "text-[hsl(var(--chart-5))]" },
+  { name: "Rédaction", icon: PenTool, count: 45, color: "text-[hsl(var(--chart-1))]" },
+  { name: "Vidéo", icon: Video, count: 34, color: "text-[hsl(var(--chart-4))]" },
+  { name: "Photographie", icon: Camera, count: 28, color: "text-sidebar-accent" },
+  { name: "Services", icon: Wrench, count: 56, color: "text-primary" },
+  { name: "Conseil", icon: Users, count: 41, color: "text-sidebar-accent" },
 ];
 
 export default function CategoryGrid() {

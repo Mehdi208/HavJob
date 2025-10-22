@@ -39,7 +39,7 @@ export default function MissionCard({
   return (
     <Card className="relative overflow-hidden hover:scale-105 hover-elevate active-elevate-2 transition-all duration-300 p-6" data-testid={`card-mission-${id}`}>
       {isBoosted && (
-        <div className="absolute top-0 right-0 bg-gradient-to-r from-red-500 via-rose-500 to-pink-500 text-white px-4 py-2 rounded-bl-xl text-sm font-semibold flex items-center gap-1.5 shadow-lg animate-pulse">
+        <div className="absolute top-0 right-0 bg-gradient-to-r from-[hsl(var(--chart-4))] via-[hsl(var(--chart-5))] to-[hsl(var(--destructive))] text-destructive-foreground px-4 py-2 rounded-bl-xl text-sm font-semibold flex items-center gap-1.5 shadow-lg animate-pulse">
           <Zap className="h-4 w-4" />
           Boost actif
         </div>
@@ -70,7 +70,7 @@ export default function MissionCard({
             {budget}
           </div>
           <div className="flex items-center gap-1.5 text-base font-medium text-foreground">
-            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+            <Star className="h-4 w-4 fill-[hsl(var(--chart-1))] text-[hsl(var(--chart-1))]" />
             {applicantsCount} candidatures
           </div>
         </div>

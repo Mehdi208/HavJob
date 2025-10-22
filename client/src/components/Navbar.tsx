@@ -16,7 +16,7 @@ export default function Navbar() {
           <div className="flex items-center gap-8">
             <Link href="/" data-testid="link-home" className="flex items-center gap-2">
               <img src={logoImage} alt="HavJob Logo" className="h-10 w-10" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-sidebar-accent bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-primary">
                 HavJob
               </h1>
             </Link>

@@ -22,7 +22,7 @@ const stats = [
     value: 4.8,
     suffix: "/5",
     label: "Note moyenne",
-    color: "text-yellow-500",
+    color: "text-[hsl(var(--chart-1))]",
     decimal: true,
   },
   {

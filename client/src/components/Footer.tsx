@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-sidebar-accent bg-clip-text text-transparent mb-4">
+            <h3 className="text-xl font-bold text-primary mb-4">
               HavJob
             </h3>
             <p className="text-sm text-muted-foreground">
