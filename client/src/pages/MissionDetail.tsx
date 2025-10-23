@@ -183,11 +183,13 @@ export default function MissionDetail() {
                   <p className="text-sm text-muted-foreground">
                     Vous devez être connecté pour postuler à cette mission
                   </p>
-                  <Link href="/login">
-                    <Button className="w-full" data-testid="button-login-prompt">
-                      Se connecter
-                    </Button>
-                  </Link>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => window.location.href = "/api/login"} 
+                    data-testid="button-login-prompt"
+                  >
+                    Se connecter
+                  </Button>
                 </div>
               ) : isOwnMission ? (
                 <div className="space-y-4">

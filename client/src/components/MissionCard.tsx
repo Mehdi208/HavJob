@@ -96,7 +96,7 @@ export default function MissionCard({
         onClick={(e) => {
           e.stopPropagation();
           if (!currentUser) {
-            setLocation("/login");
+            window.location.href = "/api/login";
           } else {
             toggleFavoriteMutation.mutate();
           }

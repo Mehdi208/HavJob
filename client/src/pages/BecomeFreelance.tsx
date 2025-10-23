@@ -63,11 +63,13 @@ export default function BecomeFreelance() {
             Rejoignez une communauté de freelances talentueux et trouvez des missions qui correspondent à vos compétences
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/register">
-              <Button size="lg" data-testid="button-register">
-                Créer mon compte freelance
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              onClick={() => window.location.href = "/api/login"} 
+              data-testid="button-register"
+            >
+              Créer mon compte freelance
+            </Button>
             <Link href="/missions">
               <Button size="lg" variant="outline" data-testid="button-browse-missions">
                 Parcourir les missions
@@ -120,11 +122,13 @@ export default function BecomeFreelance() {
         <p className="text-lg text-muted-foreground mb-8">
           Créez votre compte gratuitement et commencez à postuler aux missions dès aujourd'hui
         </p>
-        <Link href="/register">
-          <Button size="lg" data-testid="button-get-started">
-            Commencer maintenant
-          </Button>
-        </Link>
+        <Button 
+          size="lg" 
+          onClick={() => window.location.href = "/api/login"} 
+          data-testid="button-get-started"
+        >
+          Commencer maintenant
+        </Button>
       </div>
 
       <Footer />

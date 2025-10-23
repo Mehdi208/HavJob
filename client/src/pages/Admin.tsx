@@ -23,9 +23,9 @@ export default function Admin() {
 
   useEffect(() => {
     if (!userLoading && !currentUser) {
-      setLocation("/login");
+      window.location.href = "/api/login";
     }
-  }, [currentUser, userLoading, setLocation]);
+  }, [currentUser, userLoading]);
 
   const stats = [
     {
@@ -81,7 +81,7 @@ export default function Admin() {
               <p className="text-muted-foreground mb-6">
                 Vous devez être connecté pour accéder à cette page.
               </p>
-              <Button onClick={() => setLocation("/login")}>
+              <Button onClick={() => window.location.href = "/api/login"} data-testid="button-login-prompt">
                 Se connecter
               </Button>
             </CardContent>

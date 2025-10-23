@@ -78,7 +78,7 @@ export default function PublishMission() {
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <p className="text-muted-foreground">Vous devez être connecté pour publier une mission</p>
-          <Button onClick={() => setLocation("/login")}>
+          <Button onClick={() => window.location.href = "/api/login"} data-testid="button-login-prompt">
             Se connecter
           </Button>
         </div>
