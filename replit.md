@@ -55,10 +55,16 @@ Preferred communication style: Simple, everyday language.
 - Storage abstraction layer (IStorage interface) for potential database switching
 
 **Authentication Strategy:**
-- Manual login using phone number + password (email optional)
+- **Dual Authentication System:**
+  - **Replit Auth (OAuth):** Google, GitHub, X, Apple sign-in for web users via OIDC
+  - **Phone/Password Auth:** Manual registration/login with phone number + password
+- **Web Users:** Can choose either authentication method
+- **Mobile Users (Future):** Will use phone/password authentication exclusively
 - Password hashing using bcrypt with salt rounds (10)
-- Session management with express-session (in-memory store for development)
+- Session management with Passport.js + connect-pg-simple (PostgreSQL session store)
+- Session expiration: 7 days for phone auth, auto-refresh for OAuth tokens
 - Role-based access control for freelancers, clients, or both
+- authMethod field in users table distinguishes 'replit' vs 'phone' authentication
 
 ### Database Architecture
 
@@ -73,7 +79,11 @@ Preferred communication style: Simple, everyday language.
 - Drizzle-Zod integration for runtime schema validation
 
 **Schema Design:**
-- Users: phoneNumber (unique), password (bcrypt hashed), fullName, email, role
+- Users: 
+  - Core fields: id, fullName, email (nullable), phoneNumber (nullable), role
+  - Auth fields: password (bcrypt hashed, nullable), authMethod ('replit' | 'phone')
+  - Replit Auth users: email required, phoneNumber/password null
+  - Phone Auth users: phoneNumber/password required, email optional
 - Missions: title, description, category, budget, location, isRemote, status, boost info
 - Applications: freelancer applications to missions with cover letters
 - Favorites: users can save favorite missions
