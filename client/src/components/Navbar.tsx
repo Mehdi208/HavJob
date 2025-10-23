@@ -118,13 +118,28 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Button 
-                  variant="default" 
-                  onClick={() => window.location.href = '/api/login'}
-                  data-testid="button-login"
-                >
-                  Se connecter
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="default" data-testid="button-login">
+                      Se connecter
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Choisir la méthode</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link href="/connexion-telephone">
+                      <DropdownMenuItem data-testid="menu-login-phone">
+                        Avec téléphone
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem
+                      onClick={() => window.location.href = '/api/login'}
+                      data-testid="menu-login-oauth"
+                    >
+                      Avec Google / GitHub / X
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             )}
           </div>
@@ -214,14 +229,26 @@ export default function Navbar() {
                     Trouver des missions
                   </Button>
                 </Link>
-                <Button
-                  variant="default"
-                  className="w-full"
-                  onClick={() => window.location.href = '/api/login'}
-                  data-testid="button-login-mobile"
-                >
-                  Se connecter
-                </Button>
+                <div className="border-t pt-2 mt-2">
+                  <p className="text-sm text-muted-foreground px-4 pb-2">Se connecter</p>
+                  <Link href="/connexion-telephone">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      data-testid="button-login-phone-mobile"
+                    >
+                      Avec téléphone
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="default"
+                    className="w-full mt-2"
+                    onClick={() => window.location.href = '/api/login'}
+                    data-testid="button-login-oauth-mobile"
+                  >
+                    Avec Google / GitHub / X
+                  </Button>
+                </div>
               </div>
             )}
           </div>

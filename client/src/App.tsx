@@ -18,6 +18,8 @@ import Boost from "@/pages/Boost";
 import Missions from "@/pages/Missions";
 import Freelances from "@/pages/Freelances";
 import Admin from "@/pages/Admin";
+import PhoneRegister from "@/pages/PhoneRegister";
+import PhoneLogin from "@/pages/PhoneLogin";
 import NotFound from "@/pages/not-found";
 
 function HomePage() {
@@ -34,6 +36,8 @@ function Router() {
       <Route path="/publier" component={PublishMission} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/freelances" component={Freelances} />
+      <Route path="/inscription-telephone" component={PhoneRegister} />
+      <Route path="/connexion-telephone" component={PhoneLogin} />
       <Route path="/comment-ca-marche" component={HowItWorks} />
       <Route path="/devenir-freelance" component={BecomeFreelance} />
       <Route path="/boost" component={Boost} />
