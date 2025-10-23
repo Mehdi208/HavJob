@@ -21,24 +21,11 @@ import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <>
-          <Route path="/" component={Landing} />
-          <Route path="/missions/:id" component={MissionDetail} />
-          <Route path="/missions" component={Missions} />
-          <Route path="/freelances" component={Freelances} />
-          <Route path="/comment-ca-marche" component={HowItWorks} />
-          <Route path="/devenir-freelance" component={BecomeFreelance} />
-          <Route path="/aide" component={Help} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/cgu" component={CGU} />
-          <Route component={NotFound} />
-        </>
-      ) : (
+      {isAuthenticated ? (
         <>
           <Route path="/" component={Home} />
           <Route path="/missions/:id" component={MissionDetail} />
@@ -53,6 +40,19 @@ function Router() {
           <Route path="/contact" component={Contact} />
           <Route path="/cgu" component={CGU} />
           <Route path="/admin" component={Admin} />
+          <Route component={NotFound} />
+        </>
+      ) : (
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/missions/:id" component={MissionDetail} />
+          <Route path="/missions" component={Missions} />
+          <Route path="/freelances" component={Freelances} />
+          <Route path="/comment-ca-marche" component={HowItWorks} />
+          <Route path="/devenir-freelance" component={BecomeFreelance} />
+          <Route path="/aide" component={Help} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/cgu" component={CGU} />
           <Route component={NotFound} />
         </>
       )}

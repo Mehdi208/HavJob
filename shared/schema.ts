@@ -161,11 +161,6 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
   comment: z.string().min(10, "Le commentaire doit contenir au moins 10 caractères").optional(),
 });
 
-export const loginSchema = z.object({
-  phoneNumber: z.string().min(8, "Numéro de téléphone invalide"),
-  password: z.string().min(1, "Le mot de passe est requis"),
-});
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -177,4 +172,3 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
 export type Boost = typeof boosts.$inferSelect;
-export type LoginCredentials = z.infer<typeof loginSchema>;

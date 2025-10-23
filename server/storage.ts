@@ -9,7 +9,6 @@ import type {
   Favorite,
   Review,
   InsertReview,
-  LoginCredentials,
 } from "@shared/schema";
 import {
   users,
@@ -26,8 +25,6 @@ export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  getUserByPhone(phoneNumber: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
   
   // Mission methods
@@ -97,27 +94,6 @@ export class DatabaseStorage implements IStorage {
             : user.firstName || user.lastName || null,
           updatedAt: sql`CURRENT_TIMESTAMP`,
         },
-      })
-      .returning();
-    
-    return result[0];
-  }
-
-  async getUserByPhone(phoneNumber: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber)).limit(1);
-    return result[0];
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await db
-      .insert(users)
-      .values({
-        phoneNumber: insertUser.phoneNumber,
-        password: insertUser.password,
-        fullName: insertUser.fullName,
-        email: insertUser.email || null,
-        role: insertUser.role || "freelance",
-        location: insertUser.location || null,
       })
       .returning();
     
@@ -602,41 +578,6 @@ export class MemStorage implements IStorage {
     };
     this.users.set(user.id, newUser);
     return newUser;
-  }
-
-  async getUserByPhone(phoneNumber: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.phoneNumber === phoneNumber,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = {
-      id,
-      phoneNumber: insertUser.phoneNumber || null,
-      password: insertUser.password || null,
-      fullName: insertUser.fullName || null,
-      email: insertUser.email || null,
-      firstName: null,
-      lastName: null,
-      profileImageUrl: null,
-      role: insertUser.role || "freelance",
-      bio: null,
-      skills: null,
-      location: insertUser.location || null,
-      avatar: null,
-      rating: 0,
-      reviewCount: 0,
-      completedMissions: 0,
-      responseRate: 100,
-      isBoosted: false,
-      boostExpiresAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.users.set(id, user);
-    return user;
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
