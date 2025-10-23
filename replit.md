@@ -53,16 +53,29 @@ Preferred communication style: Simple, everyday language.
 - Centralized error handling middleware
 - Request/response logging for API endpoints
 - Storage abstraction layer (IStorage interface) for potential database switching
+- **API Security:**
+  - CORS: Production-only whitelisted origins, credentials enabled
+  - Rate Limiting: 100 requests/15min per IP (general API), 5 attempts/15min per IP (auth endpoints)
+  - Trust proxy enabled for correct client IP detection behind reverse proxy
+  - Input validation using Zod schemas
+  - HTTPS only in production
 
 **Authentication Strategy:**
 - **Dual Authentication System:**
   - **Replit Auth (OAuth):** Google, GitHub, X, Apple sign-in for web users via OIDC
-  - **Phone/Password Auth:** Manual registration/login with phone number + password
-- **Web Users:** Can choose either authentication method
-- **Mobile Users (Future):** Will use phone/password authentication exclusively
-- Password hashing using bcrypt with salt rounds (10)
-- Session management with Passport.js + connect-pg-simple (PostgreSQL session store)
-- Session expiration: 7 days for phone auth, auto-refresh for OAuth tokens
+  - **Phone/Password Auth:** Manual registration/login with phone number + password for web and mobile
+- **Web Users:** Can choose either authentication method (OAuth or phone/password)
+- **Mobile Users:** Use JWT-based phone/password authentication exclusively
+- **JWT Authentication (Mobile):**
+  - Access tokens: 1 hour expiration, type="access", used for API requests
+  - Refresh tokens: 7 days expiration, type="refresh", used only to obtain new access tokens
+  - Token type enforcement prevents access token recycling and refresh token misuse
+  - Middleware requireJwtAuth accepts only access tokens on protected routes
+  - Secure storage: Keychain (iOS) / EncryptedSharedPreferences (Android)
+- **Session Authentication (Web):**
+  - Password hashing using bcrypt with salt rounds (10)
+  - Session management with Passport.js + connect-pg-simple (PostgreSQL session store)
+  - Session expiration: 7 days for phone auth, auto-refresh for OAuth tokens
 - Role-based access control for freelancers, clients, or both
 - authMethod field in users table distinguishes 'replit' vs 'phone' authentication
 
@@ -117,3 +130,38 @@ Preferred communication style: Simple, everyday language.
 - TypeScript for type checking across frontend and backend
 - ESBuild for production server bundling
 - PostCSS with Autoprefixer for CSS processing
+
+## Mobile Application Development
+
+**Documentation:**
+- **API_DOCUMENTATION.md:** Complete REST API documentation for mobile development
+  - All endpoints with request/response examples
+  - JWT authentication flow (access + refresh tokens)
+  - Security details (CORS, rate limiting, validation)
+  - Swift (iOS) and Kotlin (Android) implementation examples
+  - Error handling and best practices
+- **MOBILE_PRD.md:** Product Requirements Document (1000+ lines) for mobile app development by Rork AI
+  - Project overview, objectives, and personas (Kouassi freelance, Adjoua client)
+  - Technical architecture (React Native/Flutter recommendations)
+  - Design & branding (colors, typography, spacing)
+  - MVP features vs Phase 2 features
+  - User stories with acceptance criteria
+  - User journeys (freelance + client flows)
+  - Technical specifications (JWT auth flow, state management)
+  - Detailed screen specifications with ASCII wireframes
+  - Business rules (missions, applications, favorites, profiles)
+  - 4-sprint development plan (8 weeks to MVP)
+  - Launch checklist (beta + production)
+
+**Mobile API Endpoints:**
+- POST /api/mobile/register - User registration with phone/password
+- POST /api/mobile/login - User authentication
+- POST /api/mobile/refresh - Refresh access token using refresh token
+- GET /api/mobile/user - Get authenticated user profile
+- All mission, application, favorite, and review endpoints accessible via JWT authentication
+
+**Technology Stack (Recommended for Mobile):**
+- React Native (Expo) or Flutter
+- JWT authentication with secure token storage
+- PostgreSQL database (shared with web app)
+- Chariow payment integration (Phase 2)
