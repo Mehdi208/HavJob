@@ -10,6 +10,7 @@ import {
 } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { generateAccessToken, generateRefreshToken, verifyToken, requireJwtAuth } from "./jwtAuth";
 import bcrypt from "bcrypt";
 import "./types";
 
@@ -158,6 +159,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ message: "Déconnexion réussie" });
       });
     });
+  });
+
+  // Mobile Authentication Routes (JWT-based)
+  
+  // Mobile register with phone number and password
+  app.post('/api/mobile/register', async (req, res) => {
+    try {
+      const validatedData = phoneRegisterSchema.parse(req.body);
+      
+      // Check if phone number already exists
+      const existingUser = await storage.getUserByPhone(validatedData.phoneNumber);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Ce numéro de téléphone est déjà utilisé" 
+        });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+
+      // Create user with phone auth
+      const newUser = await storage.createPhoneUser({
+        phoneNumber: validatedData.phoneNumber,
+        password: hashedPassword,
+        fullName: validatedData.fullName,
+        email: validatedData.email || undefined,
+        role: validatedData.role,
+      });
+
+      // Generate JWT tokens
+      const accessToken = generateAccessToken(newUser.id);
+      const refreshToken = generateRefreshToken(newUser.id);
+
+      // Return user without password and with tokens
+      const { password, ...userWithoutPassword } = newUser;
+      res.status(201).json({
+        user: userWithoutPassword,
+        accessToken,
+        refreshToken,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: error.errors 
+        });
+      }
+      console.error("Mobile registration error:", error);
+      res.status(500).json({ message: "Erreur lors de l'inscription" });
+    }
+  });
+
+  // Mobile login with phone number and password
+  app.post('/api/mobile/login', async (req, res) => {
+    try {
+      const validatedData = phoneLoginSchema.parse(req.body);
+      
+      // Find user by phone number
+      const user = await storage.getUserByPhone(validatedData.phoneNumber);
+      if (!user) {
+        return res.status(401).json({ 
+          message: "Numéro de téléphone ou mot de passe incorrect" 
+        });
+      }
+
+      // Check if user has phone auth method
+      if (user.authMethod !== 'phone' || !user.password) {
+        return res.status(401).json({ 
+          message: "Numéro de téléphone ou mot de passe incorrect" 
+        });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(
+        validatedData.password, 
+        user.password
+      );
+      
+      if (!isValidPassword) {
+        return res.status(401).json({ 
+          message: "Numéro de téléphone ou mot de passe incorrect" 
+        });
+      }
+
+      // Generate JWT tokens
+      const accessToken = generateAccessToken(user.id);
+      const refreshToken = generateRefreshToken(user.id);
+
+      // Return user without password and with tokens
+      const { password, ...userWithoutPassword } = user;
+      res.json({
+        user: userWithoutPassword,
+        accessToken,
+        refreshToken,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: error.errors 
+        });
+      }
+      console.error("Mobile login error:", error);
+      res.status(500).json({ message: "Erreur lors de la connexion" });
+    }
+  });
+
+  // Mobile refresh token
+  app.post('/api/mobile/refresh', async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      
+      if (!refreshToken) {
+        return res.status(400).json({ message: "Refresh token manquant" });
+      }
+
+      // Verify refresh token - MUST be a refresh token, not an access token
+      const decoded = verifyToken(refreshToken, "refresh");
+      if (!decoded) {
+        return res.status(401).json({ message: "Refresh token invalide ou expiré" });
+      }
+
+      // Generate new access token
+      const newAccessToken = generateAccessToken(decoded.userId);
+
+      res.json({ accessToken: newAccessToken });
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      res.status(500).json({ message: "Erreur lors du rafraîchissement du token" });
+    }
+  });
+
+  // Mobile get current user (JWT-based)
+  app.get('/api/mobile/user', requireJwtAuth, async (req: any, res) => {
+    try {
+      const userId = req.jwtUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+
+      // Return user without password
+      const { password, ...userWithoutPassword } = user as any;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Erreur lors de la récupération de l'utilisateur" });
+    }
   });
 
   // Auth route - get current user (unified for both auth methods)
