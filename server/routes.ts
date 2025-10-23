@@ -1,102 +1,25 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertMissionSchema, insertApplicationSchema, insertReviewSchema, loginSchema } from "@shared/schema";
+import { insertMissionSchema, insertApplicationSchema, insertReviewSchema } from "@shared/schema";
 import { z } from "zod";
-import bcrypt from "bcrypt";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import "./types";
 
-// Middleware to check if user is authenticated
-function requireAuth(req: Request, res: Response, next: Function) {
-  if (!req.session.userId) {
-    return res.status(401).send({ error: "Non authentifié" });
-  }
-  next();
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth routes
-  app.post("/api/auth/register", async (req, res) => {
+  // Setup Replit Auth
+  await setupAuth(app);
+
+  // Auth route - get current user
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const validatedData = insertUserSchema.parse(req.body);
-      
-      // Check if user already exists
-      const existingUser = await storage.getUserByPhone(validatedData.phoneNumber);
-      if (existingUser) {
-        return res.status(400).send({ error: "Ce numéro de téléphone est déjà utilisé" });
-      }
-
-      // Hash password with bcrypt
-      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
-      const user = await storage.createUser({
-        ...validatedData,
-        password: hashedPassword,
-      });
-      
-      // Create session
-      req.session.userId = user.id;
-      await req.session.save();
-      
-      // Don't send password back
-      const { password, ...userWithoutPassword } = user;
-      res.status(201).send(userWithoutPassword);
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).send({ error: "Données invalides", details: error.errors });
-      }
-      res.status(500).send({ error: "Erreur serveur" });
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
-  });
-
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { phoneNumber, password } = loginSchema.parse(req.body);
-      
-      const user = await storage.getUserByPhone(phoneNumber);
-      if (!user) {
-        return res.status(401).send({ error: "Numéro de téléphone ou mot de passe incorrect" });
-      }
-
-      // Compare with hashed password using bcrypt
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).send({ error: "Numéro de téléphone ou mot de passe incorrect" });
-      }
-
-      req.session.userId = user.id;
-      await req.session.save();
-      
-      const { password: _, ...userWithoutPassword } = user;
-      res.send(userWithoutPassword);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).send({ error: "Données invalides" });
-      }
-      res.status(500).send({ error: "Erreur serveur" });
-    }
-  });
-
-  app.post("/api/auth/logout", (req, res) => {
-    req.session.destroy((err: Error | null) => {
-      if (err) {
-        return res.status(500).send({ error: "Erreur lors de la déconnexion" });
-      }
-      res.send({ success: true });
-    });
-  });
-
-  app.get("/api/auth/me", async (req, res) => {
-    if (!req.session.userId) {
-      return res.status(401).send({ error: "Non authentifié" });
-    }
-
-    const user = await storage.getUser(req.session.userId);
-    if (!user) {
-      return res.status(404).send({ error: "Utilisateur non trouvé" });
-    }
-
-    const { password, ...userWithoutPassword } = user;
-    res.send(userWithoutPassword);
   });
 
   // Mission routes
@@ -133,12 +56,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/missions", requireAuth, async (req, res) => {
+  app.post("/api/missions", isAuthenticated, async (req, res) => {
     try {
       const validatedData = insertMissionSchema.parse(req.body);
       const mission = await storage.createMission({
         ...validatedData,
-        clientId: req.session.userId!,
+        clientId: (req as any).user.claims.sub!,
       });
       res.status(201).send(mission);
     } catch (error) {
@@ -149,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/missions/:id", requireAuth, async (req, res) => {
+  app.patch("/api/missions/:id", isAuthenticated, async (req, res) => {
     try {
       const mission = await storage.getMission(req.params.id);
       if (!mission) {
@@ -157,7 +80,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user owns this mission
-      if (mission.clientId !== req.session.userId) {
+      if (mission.clientId !== (req as any).user.claims.sub) {
         return res.status(403).send({ error: "Non autorisé" });
       }
 
@@ -168,14 +91,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/missions/:id", requireAuth, async (req, res) => {
+  app.delete("/api/missions/:id", isAuthenticated, async (req, res) => {
     try {
       const mission = await storage.getMission(req.params.id);
       if (!mission) {
         return res.status(404).send({ error: "Mission non trouvée" });
       }
 
-      if (mission.clientId !== req.session.userId) {
+      if (mission.clientId !== (req as any).user.claims.sub) {
         return res.status(403).send({ error: "Non autorisé" });
       }
 
@@ -196,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Application routes
-  app.get("/api/missions/:id/applications", requireAuth, async (req, res) => {
+  app.get("/api/missions/:id/applications", isAuthenticated, async (req, res) => {
     try {
       const mission = await storage.getMission(req.params.id);
       if (!mission) {
@@ -204,7 +127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Only mission owner can see applications
-      if (mission.clientId !== req.session.userId) {
+      if (mission.clientId !== (req as any).user.claims.sub) {
         return res.status(403).send({ error: "Non autorisé" });
       }
 
@@ -215,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/missions/:id/apply", requireAuth, async (req, res) => {
+  app.post("/api/missions/:id/apply", isAuthenticated, async (req, res) => {
     try {
       const mission = await storage.getMission(req.params.id);
       if (!mission) {
@@ -223,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Can't apply to own mission
-      if (mission.clientId === req.session.userId) {
+      if (mission.clientId === (req as any).user.claims.sub) {
         return res.status(400).send({ error: "Vous ne pouvez pas candidater à votre propre mission" });
       }
 
@@ -234,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const application = await storage.createApplication({
         ...validatedData,
-        freelancerId: req.session.userId!,
+        freelancerId: (req as any).user.claims.sub!,
       });
 
       res.status(201).send(application);
@@ -246,16 +169,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/me/applications", requireAuth, async (req, res) => {
+  app.get("/api/users/me/applications", isAuthenticated, async (req, res) => {
     try {
-      const applications = await storage.getApplicationsByFreelancer(req.session.userId!);
+      const applications = await storage.getApplicationsByFreelancer((req as any).user.claims.sub!);
       res.send(applications);
     } catch (error) {
       res.status(500).send({ error: "Erreur serveur" });
     }
   });
 
-  app.patch("/api/applications/:id", requireAuth, async (req, res) => {
+  app.patch("/api/applications/:id", isAuthenticated, async (req, res) => {
     try {
       const application = await storage.getApplication(req.params.id);
       if (!application) {
@@ -268,7 +191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Only mission owner or applicant can update
-      if (mission.clientId !== req.session.userId && application.freelancerId !== req.session.userId) {
+      if (mission.clientId !== (req as any).user.claims.sub && application.freelancerId !== (req as any).user.claims.sub) {
         return res.status(403).send({ error: "Non autorisé" });
       }
 
@@ -280,46 +203,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Favorite routes
-  app.get("/api/users/me/favorites", requireAuth, async (req, res) => {
+  app.get("/api/users/me/favorites", isAuthenticated, async (req, res) => {
     try {
-      const favorites = await storage.getFavoritesByUser(req.session.userId!);
+      const favorites = await storage.getFavoritesByUser((req as any).user.claims.sub!);
       res.send(favorites);
     } catch (error) {
       res.status(500).send({ error: "Erreur serveur" });
     }
   });
 
-  app.post("/api/missions/:id/favorite", requireAuth, async (req, res) => {
+  app.post("/api/missions/:id/favorite", isAuthenticated, async (req, res) => {
     try {
       const mission = await storage.getMission(req.params.id);
       if (!mission) {
         return res.status(404).send({ error: "Mission non trouvée" });
       }
 
-      const isFavorite = await storage.isFavorite(req.session.userId!, req.params.id);
+      const isFavorite = await storage.isFavorite((req as any).user.claims.sub!, req.params.id);
       if (isFavorite) {
         return res.status(400).send({ error: "Cette mission est déjà dans vos favoris" });
       }
 
-      const favorite = await storage.addFavorite(req.session.userId!, req.params.id);
+      const favorite = await storage.addFavorite((req as any).user.claims.sub!, req.params.id);
       res.status(201).send(favorite);
     } catch (error) {
       res.status(500).send({ error: "Erreur serveur" });
     }
   });
 
-  app.delete("/api/missions/:id/favorite", requireAuth, async (req, res) => {
+  app.delete("/api/missions/:id/favorite", isAuthenticated, async (req, res) => {
     try {
-      await storage.removeFavorite(req.session.userId!, req.params.id);
+      await storage.removeFavorite((req as any).user.claims.sub!, req.params.id);
       res.send({ success: true });
     } catch (error) {
       res.status(500).send({ error: "Erreur serveur" });
     }
   });
 
-  app.get("/api/missions/:id/is-favorite", requireAuth, async (req, res) => {
+  app.get("/api/missions/:id/is-favorite", isAuthenticated, async (req, res) => {
     try {
-      const isFavorite = await storage.isFavorite(req.session.userId!, req.params.id);
+      const isFavorite = await storage.isFavorite((req as any).user.claims.sub!, req.params.id);
       res.send({ isFavorite });
     } catch (error) {
       res.status(500).send({ error: "Erreur serveur" });
@@ -341,12 +264,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/users/me", requireAuth, async (req, res) => {
+  app.patch("/api/users/me", isAuthenticated, async (req, res) => {
     try {
       // Don't allow updating password or id through this route
       const { password, id, ...updates } = req.body;
       
-      const updatedUser = await storage.updateUser(req.session.userId!, updates);
+      const updatedUser = await storage.updateUser((req as any).user.claims.sub!, updates);
       if (!updatedUser) {
         return res.status(404).send({ error: "Utilisateur non trouvé" });
       }
@@ -368,12 +291,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/reviews", requireAuth, async (req, res) => {
+  app.post("/api/reviews", isAuthenticated, async (req, res) => {
     try {
       const validatedData = insertReviewSchema.parse(req.body);
       const review = await storage.createReview({
         ...validatedData,
-        reviewerId: req.session.userId!,
+        reviewerId: (req as any).user.claims.sub!,
       });
       res.status(201).send(review);
     } catch (error) {
