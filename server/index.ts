@@ -54,8 +54,8 @@ const authLimiter = rateLimit({
 app.use("/api/", apiLimiter);
 app.use("/api/mobile/register", authLimiter);
 app.use("/api/mobile/login", authLimiter);
-app.use("/api/phone/register", authLimiter);
-app.use("/api/phone/login", authLimiter);
+app.use("/api/auth/register-phone", authLimiter);
+app.use("/api/auth/login-phone", authLimiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
