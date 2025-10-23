@@ -4,6 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const userRoleEnum = pgEnum("user_role", ["freelance", "client", "both"]);
+export const authMethodEnum = pgEnum("auth_method", ["replit", "phone"]);
 export const missionStatusEnum = pgEnum("mission_status", ["open", "in_progress", "completed", "cancelled"]);
 export const applicationStatusEnum = pgEnum("application_status", ["pending", "accepted", "rejected", "withdrawn"]);
 export const boostDurationEnum = pgEnum("boost_duration", ["1", "3", "7", "15", "30"]);
@@ -22,12 +23,14 @@ export const sessions = pgTable(
 // User storage table (updated for Replit Auth compatibility)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  // Replit Auth fields
+  // Authentication method: 'replit' for OAuth, 'phone' for phone/password
+  authMethod: authMethodEnum("auth_method").notNull().default("replit"),
+  // Replit Auth fields (nullable for phone auth users)
   email: varchar("email", { length: 255 }).unique(),
   firstName: varchar("first_name", { length: 100 }),
   lastName: varchar("last_name", { length: 100 }),
   profileImageUrl: varchar("profile_image_url", { length: 500 }),
-  // HavJob specific fields (kept for backward compatibility, made optional)
+  // Phone auth fields (nullable for Replit Auth users)
   phoneNumber: varchar("phone_number", { length: 20 }).unique(),
   password: text("password"),
   fullName: text("full_name"),
@@ -105,6 +108,21 @@ export const boosts = pgTable("boosts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Phone registration schema (for phone/password auth)
+export const phoneRegisterSchema = z.object({
+  phoneNumber: z.string().min(8, "Numéro de téléphone invalide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  fullName: z.string().min(2, "Le nom complet est requis"),
+  email: z.string().email("Email invalide").optional().or(z.literal("")),
+  role: z.enum(["freelance", "client", "both"]).default("freelance"),
+});
+
+// Phone login schema
+export const phoneLoginSchema = z.object({
+  phoneNumber: z.string().min(8, "Numéro de téléphone invalide"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   rating: true,
@@ -115,6 +133,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   boostExpiresAt: true,
   createdAt: true,
   updatedAt: true,
+  authMethod: true,
 }).extend({
   phoneNumber: z.string().min(8, "Numéro de téléphone invalide").optional(),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").optional(),
@@ -163,6 +182,8 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
+export type PhoneRegister = z.infer<typeof phoneRegisterSchema>;
+export type PhoneLogin = z.infer<typeof phoneLoginSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertMission = z.infer<typeof insertMissionSchema>;
 export type Mission = typeof missions.$inferSelect;

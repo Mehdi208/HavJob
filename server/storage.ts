@@ -2,6 +2,7 @@ import type {
   User,
   InsertUser,
   UpsertUser,
+  PhoneRegister,
   Mission,
   InsertMission,
   Application,
@@ -24,7 +25,9 @@ import { randomUUID } from "crypto";
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
+  getUserByPhone(phoneNumber: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  createPhoneUser(user: PhoneRegister & { password: string }): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
   
   // Mission methods
@@ -66,6 +69,31 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByPhone(phoneNumber: string): Promise<User | undefined> {
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.phoneNumber, phoneNumber))
+      .limit(1);
+    return result[0];
+  }
+
+  async createPhoneUser(userData: PhoneRegister & { password: string }): Promise<User> {
+    const result = await db
+      .insert(users)
+      .values({
+        authMethod: 'phone',
+        phoneNumber: userData.phoneNumber,
+        password: userData.password,
+        fullName: userData.fullName,
+        email: userData.email || null,
+        role: userData.role,
+      })
+      .returning();
+    
     return result[0];
   }
 
@@ -394,6 +422,7 @@ export class MemStorage implements IStorage {
     
     this.users.set(clientId1, {
       id: clientId1,
+      authMethod: "phone" as const,
       phoneNumber: "+225 07 12 34 56 78",
       password: "password123",
       fullName: "Traoré Bakary",
@@ -418,6 +447,7 @@ export class MemStorage implements IStorage {
 
     this.users.set(freelancerId, {
       id: freelancerId,
+      authMethod: "phone" as const,
       phoneNumber: "+225 05 98 76 54 32",
       password: "password123",
       fullName: "N'Guessan Sophie",
@@ -442,6 +472,7 @@ export class MemStorage implements IStorage {
 
     this.users.set(clientId2, {
       id: clientId2,
+      authMethod: "phone" as const,
       phoneNumber: "+225 07 44 55 66 77",
       password: "password123",
       fullName: "Kouassi Jean",
@@ -533,6 +564,40 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
+  async getUserByPhone(phoneNumber: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(u => u.phoneNumber === phoneNumber);
+  }
+
+  async createPhoneUser(userData: PhoneRegister & { password: string }): Promise<User> {
+    const id = randomUUID();
+    const newUser: User = {
+      id,
+      authMethod: "phone",
+      phoneNumber: userData.phoneNumber,
+      password: userData.password,
+      fullName: userData.fullName,
+      email: userData.email || null,
+      firstName: null,
+      lastName: null,
+      profileImageUrl: null,
+      role: userData.role,
+      bio: null,
+      skills: null,
+      location: null,
+      avatar: null,
+      rating: 0,
+      reviewCount: 0,
+      completedMissions: 0,
+      responseRate: 100,
+      isBoosted: false,
+      boostExpiresAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(id, newUser);
+    return newUser;
+  }
+
   async upsertUser(user: UpsertUser): Promise<User> {
     const existing = this.users.get(user.id);
     if (existing) {
@@ -553,6 +618,7 @@ export class MemStorage implements IStorage {
     
     const newUser: User = {
       id: user.id,
+      authMethod: "replit",
       email: user.email || null,
       firstName: user.firstName || null,
       lastName: user.lastName || null,

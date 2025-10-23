@@ -104,7 +104,8 @@ export async function setupAuth(app: Express) {
       claims: user.claims,
       access_token: user.access_token,
       refresh_token: user.refresh_token,
-      expires_at: user.expires_at
+      expires_at: user.expires_at,
+      authMethod: user.authMethod || 'replit' // Support both phone and replit auth
     });
   });
   
@@ -147,6 +148,17 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   }
 
   const now = Math.floor(Date.now() / 1000);
+  
+  // For phone authentication, simply check expiry
+  if (user.authMethod === 'phone') {
+    if (now <= user.expires_at) {
+      return next();
+    }
+    // Phone session expired
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // For Replit Auth, check expiry and refresh if needed
   if (now <= user.expires_at) {
     return next();
   }

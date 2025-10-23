@@ -1,16 +1,166 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertMissionSchema, insertApplicationSchema, insertReviewSchema } from "@shared/schema";
+import { 
+  insertMissionSchema, 
+  insertApplicationSchema, 
+  insertReviewSchema,
+  phoneRegisterSchema,
+  phoneLoginSchema 
+} from "@shared/schema";
 import { z } from "zod";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import bcrypt from "bcrypt";
 import "./types";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
   await setupAuth(app);
 
-  // Auth route - get current user
+  // Phone Authentication Routes
+  
+  // Register with phone number and password
+  app.post('/api/auth/register-phone', async (req, res) => {
+    try {
+      const validatedData = phoneRegisterSchema.parse(req.body);
+      
+      // Check if phone number already exists
+      const existingUser = await storage.getUserByPhone(validatedData.phoneNumber);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Ce numéro de téléphone est déjà utilisé" 
+        });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+
+      // Create user with phone auth
+      const newUser = await storage.createPhoneUser({
+        phoneNumber: validatedData.phoneNumber,
+        password: hashedPassword,
+        fullName: validatedData.fullName,
+        email: validatedData.email || undefined,
+        role: validatedData.role,
+      });
+
+      // Create user object for Passport session
+      const sessionUser = {
+        claims: { sub: newUser.id },
+        authMethod: 'phone',
+        expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 1 week
+      };
+
+      // Regenerate session to prevent fixation, then login
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ message: "Erreur de session" });
+        }
+        
+        // Use Passport's login to properly serialize the user
+        req.logIn(sessionUser, (err) => {
+          if (err) {
+            console.error("Login error:", err);
+            return res.status(500).json({ message: "Erreur de connexion" });
+          }
+          
+          // Return user without password
+          const { password, ...userWithoutPassword } = newUser;
+          res.status(201).json(userWithoutPassword);
+        });
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: error.errors 
+        });
+      }
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Erreur lors de l'inscription" });
+    }
+  });
+
+  // Login with phone number and password
+  app.post('/api/auth/login-phone', async (req, res) => {
+    try {
+      const validatedData = phoneLoginSchema.parse(req.body);
+      
+      // Find user by phone number
+      const user = await storage.getUserByPhone(validatedData.phoneNumber);
+      if (!user || user.authMethod !== 'phone') {
+        return res.status(401).json({ 
+          message: "Numéro de téléphone ou mot de passe incorrect" 
+        });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(
+        validatedData.password, 
+        user.password!
+      );
+      
+      if (!isValidPassword) {
+        return res.status(401).json({ 
+          message: "Numéro de téléphone ou mot de passe incorrect" 
+        });
+      }
+
+      // Create user object for Passport session
+      const sessionUser = {
+        claims: { sub: user.id },
+        authMethod: 'phone',
+        expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 1 week
+      };
+
+      // Regenerate session to prevent fixation, then login
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ message: "Erreur de session" });
+        }
+        
+        // Use Passport's login to properly serialize the user
+        req.logIn(sessionUser, (err) => {
+          if (err) {
+            console.error("Login error:", err);
+            return res.status(500).json({ message: "Erreur de connexion" });
+          }
+          
+          // Return user without password
+          const { password, ...userWithoutPassword } = user;
+          res.json(userWithoutPassword);
+        });
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides", 
+          errors: error.errors 
+        });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Erreur lors de la connexion" });
+    }
+  });
+
+  // Logout (works for both auth methods)
+  app.post('/api/auth/logout-phone', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Erreur lors de la déconnexion" });
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({ message: "Erreur lors de la déconnexion" });
+        }
+        res.json({ message: "Déconnexion réussie" });
+      });
+    });
+  });
+
+  // Auth route - get current user (unified for both auth methods)
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
