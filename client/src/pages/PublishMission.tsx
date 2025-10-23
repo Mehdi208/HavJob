@@ -32,7 +32,7 @@ export default function PublishMission() {
   const { toast } = useToast();
 
   const { data: currentUser } = useQuery<User>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
   });
 
   const form = useForm<InsertMission>({

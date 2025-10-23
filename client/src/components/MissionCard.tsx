@@ -42,7 +42,7 @@ export default function MissionCard({
   const { toast } = useToast();
 
   const { data: currentUser } = useQuery<User>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
   });
 
   const { data: favorites = [] } = useQuery<any[]>({

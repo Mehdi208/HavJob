@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
 
   const { data: currentUser, isLoading } = useQuery<User>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
   });
 
   const { data: myMissions = [] } = useQuery<Mission[]>({

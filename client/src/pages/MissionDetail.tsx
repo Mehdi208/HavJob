@@ -25,7 +25,7 @@ export default function MissionDetail() {
   });
 
   const { data: currentUser } = useQuery<User>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
   });
 
   const applyMutation = useMutation({

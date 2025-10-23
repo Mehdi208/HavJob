@@ -20,42 +20,28 @@ import Freelances from "@/pages/Freelances";
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+function HomePage() {
   const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Home /> : <Landing />;
+}
 
+function Router() {
   return (
     <Switch>
-      {isAuthenticated ? (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/missions/:id" component={MissionDetail} />
-          <Route path="/missions" component={Missions} />
-          <Route path="/publier" component={PublishMission} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/freelances" component={Freelances} />
-          <Route path="/comment-ca-marche" component={HowItWorks} />
-          <Route path="/devenir-freelance" component={BecomeFreelance} />
-          <Route path="/boost" component={Boost} />
-          <Route path="/aide" component={Help} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/cgu" component={CGU} />
-          <Route path="/admin" component={Admin} />
-          <Route component={NotFound} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={Landing} />
-          <Route path="/missions/:id" component={MissionDetail} />
-          <Route path="/missions" component={Missions} />
-          <Route path="/freelances" component={Freelances} />
-          <Route path="/comment-ca-marche" component={HowItWorks} />
-          <Route path="/devenir-freelance" component={BecomeFreelance} />
-          <Route path="/aide" component={Help} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/cgu" component={CGU} />
-          <Route component={NotFound} />
-        </>
-      )}
+      <Route path="/" component={HomePage} />
+      <Route path="/missions/:id" component={MissionDetail} />
+      <Route path="/missions" component={Missions} />
+      <Route path="/publier" component={PublishMission} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/freelances" component={Freelances} />
+      <Route path="/comment-ca-marche" component={HowItWorks} />
+      <Route path="/devenir-freelance" component={BecomeFreelance} />
+      <Route path="/boost" component={Boost} />
+      <Route path="/aide" component={Help} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/cgu" component={CGU} />
+      <Route path="/admin" component={Admin} />
+      <Route component={NotFound} />
     </Switch>
   );
 }

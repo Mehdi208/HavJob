@@ -13,7 +13,7 @@ export default function Admin() {
   const [, setLocation] = useLocation();
   
   const { data: currentUser, isLoading: userLoading } = useQuery<User>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
     retry: false,
   });
   
