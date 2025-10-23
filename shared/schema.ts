@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, pgEnum, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -8,12 +8,29 @@ export const missionStatusEnum = pgEnum("mission_status", ["open", "in_progress"
 export const applicationStatusEnum = pgEnum("application_status", ["pending", "accepted", "rejected", "withdrawn"]);
 export const boostDurationEnum = pgEnum("boost_duration", ["1", "3", "7", "15", "30"]);
 
+// Session storage table (required for Replit Auth)
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table (updated for Replit Auth compatibility)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  phoneNumber: varchar("phone_number", { length: 20 }).notNull().unique(),
-  password: text("password").notNull(),
-  fullName: text("full_name").notNull(),
-  email: varchar("email", { length: 255 }),
+  // Replit Auth fields
+  email: varchar("email", { length: 255 }).unique(),
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  profileImageUrl: varchar("profile_image_url", { length: 500 }),
+  // HavJob specific fields (kept for backward compatibility, made optional)
+  phoneNumber: varchar("phone_number", { length: 20 }).unique(),
+  password: text("password"),
+  fullName: text("full_name"),
   role: userRoleEnum("role").notNull().default("freelance"),
   bio: text("bio"),
   skills: text("skills").array(),
@@ -26,6 +43,7 @@ export const users = pgTable("users", {
   isBoosted: boolean("is_boosted").default(false),
   boostExpiresAt: timestamp("boost_expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const missions = pgTable("missions", {
@@ -96,11 +114,21 @@ export const insertUserSchema = createInsertSchema(users).omit({
   isBoosted: true,
   boostExpiresAt: true,
   createdAt: true,
+  updatedAt: true,
 }).extend({
-  phoneNumber: z.string().min(8, "Numéro de téléphone invalide"),
-  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-  fullName: z.string().min(2, "Le nom complet est requis"),
+  phoneNumber: z.string().min(8, "Numéro de téléphone invalide").optional(),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").optional(),
+  fullName: z.string().min(2, "Le nom complet est requis").optional(),
   email: z.union([z.string().email("Email invalide"), z.literal("")]).optional(),
+});
+
+// Replit Auth specific upsert schema
+export const upsertUserSchema = z.object({
+  id: z.string(),
+  email: z.string().email().nullable().optional(),
+  firstName: z.string().nullable().optional(),
+  lastName: z.string().nullable().optional(),
+  profileImageUrl: z.string().nullable().optional(),
 });
 
 export const insertMissionSchema = createInsertSchema(missions).omit({
@@ -139,6 +167,7 @@ export const loginSchema = z.object({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertMission = z.infer<typeof insertMissionSchema>;
 export type Mission = typeof missions.$inferSelect;
