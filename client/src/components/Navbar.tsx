@@ -38,52 +38,52 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-16 md:h-20 gap-4">
           <Link
             href="/"
             data-testid="link-home"
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 flex-shrink-0"
           >
-            <img src={logoImage} alt="HavJob Logo" className="h-10 w-10 ml-[-10px] mr-[-10px]" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-sidebar-accent to-primary bg-clip-text text-transparent">HavJob</h1>
+            <img src={logoImage} alt="HavJob Logo" className="h-8 w-8 md:h-10 md:w-10" />
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary via-sidebar-accent to-primary bg-clip-text text-transparent whitespace-nowrap">HavJob</h1>
           </Link>
 
           {!isAuthenticated && (
-            <div className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-1 justify-center max-w-2xl mx-4">
               <Link href="/">
-                <Button variant="ghost" data-testid="nav-link-home">
+                <Button variant="ghost" size="sm" className="text-sm" data-testid="nav-link-home">
                   Accueil
                 </Button>
               </Link>
               <Link href="/publier">
-                <Button variant="ghost" data-testid="nav-link-publish">
-                  Publier une mission
+                <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap" data-testid="nav-link-publish">
+                  Publier
                 </Button>
               </Link>
               <Link href="/missions">
-                <Button variant="ghost" data-testid="nav-link-missions">
-                  Trouver des missions
+                <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap" data-testid="nav-link-missions">
+                  Missions
                 </Button>
               </Link>
             </div>
           )}
 
           {isAuthenticated && (
-            <div className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-1 justify-center max-w-2xl mx-4">
               <Link href="/">
-                <Button variant="ghost" data-testid="nav-link-home">
+                <Button variant="ghost" size="sm" className="text-sm" data-testid="nav-link-home">
                   Accueil
                 </Button>
               </Link>
               <Link href="/missions">
-                <Button variant="ghost" data-testid="nav-link-missions">
-                  Trouver des missions
+                <Button variant="ghost" size="sm" className="text-sm" data-testid="nav-link-missions">
+                  Missions
                 </Button>
               </Link>
             </div>
           )}
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0">
             {isAuthenticated ? (
               <>
                 <DropdownMenu>
@@ -132,7 +132,7 @@ export default function Navbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden flex-shrink-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             data-testid="button-menu"
           >
@@ -145,7 +145,7 @@ export default function Navbar() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-4">
+          <div className="lg:hidden py-4 space-y-4">
             {isAuthenticated ? (
               <div className="flex flex-col gap-2">
                 <Link href="/">
