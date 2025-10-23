@@ -1,9 +1,62 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Trust proxy - required for rate limiting behind reverse proxy (Replit, production)
+// This allows express-rate-limit to identify individual client IPs from X-Forwarded-For
+app.set('trust proxy', 1);
+
+// CORS configuration for mobile apps
+app.use(cors({
+  origin: process.env.NODE_ENV === "production" 
+    ? [
+        process.env.WEB_URL || "https://havjob.replit.app",
+        // Add mobile app origins if needed
+      ]
+    : true, // Allow all origins in development
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// Rate limiting for API endpoints
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Trop de requêtes depuis cette adresse IP, veuillez réessayer plus tard"
+    });
+  },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login/register attempts per windowMs
+  skipSuccessfulRequests: true, // Don't count successful requests
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Trop de tentatives de connexion, veuillez réessayer dans 15 minutes"
+    });
+  },
+});
+
+// Apply rate limiters
+app.use("/api/", apiLimiter);
+app.use("/api/mobile/register", authLimiter);
+app.use("/api/mobile/login", authLimiter);
+app.use("/api/phone/register", authLimiter);
+app.use("/api/phone/login", authLimiter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

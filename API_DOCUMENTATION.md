@@ -621,6 +621,61 @@ Authorization: Bearer <access_token>
 
 ---
 
+## Sécurité de l'API
+
+### CORS (Cross-Origin Resource Sharing)
+
+L'API accepte les requêtes cross-origin depuis :
+- **Production** : Uniquement les domaines autorisés (web app HavJob)
+- **Development** : Tous les domaines (pour faciliter le développement)
+
+### Rate Limiting
+
+L'API implémente deux types de rate limiting pour prévenir les abus :
+
+#### 1. Rate Limiting Général (API)
+- **Limite** : 100 requêtes par 15 minutes par IP
+- **Endpoints concernés** : Tous les endpoints `/api/*`
+- **Réponse si dépassé** : 429 Too Many Requests
+```json
+{
+  "message": "Trop de requêtes depuis cette adresse IP, veuillez réessayer plus tard"
+}
+```
+
+#### 2. Rate Limiting Authentification
+- **Limite** : 5 tentatives par 15 minutes par IP
+- **Endpoints concernés** :
+  - POST `/api/mobile/register`
+  - POST `/api/mobile/login`
+  - POST `/api/phone/register`
+  - POST `/api/phone/login`
+- **Réponse si dépassé** : 429 Too Many Requests
+```json
+{
+  "message": "Trop de tentatives de connexion, veuillez réessayer dans 15 minutes"
+}
+```
+
+**Note** : Les tentatives réussies ne sont pas comptées dans la limite d'authentification.
+
+### Validation des Données
+
+Tous les endpoints valident strictement les données d'entrée :
+- **Format des données** : Validation via schemas Zod
+- **Types de données** : Vérification des types attendus
+- **Champs requis** : Vérification de la présence des champs obligatoires
+- **Longueurs** : Validation des longueurs minimales/maximales
+
+### Production
+
+En production, assurez-vous de configurer :
+- `JWT_SECRET` : Secret fort pour signer les JWT (obligatoire)
+- `SESSION_SECRET` : Secret pour les sessions web
+- `WEB_URL` : URL de l'application web pour CORS
+
+---
+
 ## Codes d'erreur HTTP
 
 | Code | Signification |
@@ -632,6 +687,7 @@ Authorization: Bearer <access_token>
 | 403 | Non autorisé (permissions insuffisantes) |
 | 404 | Ressource non trouvée |
 | 409 | Conflit (ex: téléphone déjà utilisé) |
+| 429 | Trop de requêtes (rate limiting) |
 | 500 | Erreur serveur interne |
 
 ---
