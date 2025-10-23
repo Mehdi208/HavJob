@@ -15,44 +15,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import logoImage from "@assets/HavJob-Logo-Sans-Fond.png";
 import type { User as UserType } from "@shared/schema";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
 
   const { data: currentUser } = useQuery<UserType>({
-    queryKey: ["/api/auth/me"],
+    queryKey: ["/api/auth/user"],
     retry: false,
   });
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/auth/logout");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
-      toast({
-        title: "Déconnexion réussie",
-        description: "À bientôt sur HavJob !",
-      });
-      setLocation("/");
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de se déconnecter",
-      });
-    },
-  });
+  const handleLogout = () => {
+    // Replit Auth logout - navigate to /api/logout
+    window.location.href = "/api/logout";
+  };
 
   const isAuthenticated = !!currentUser;
 
@@ -128,7 +107,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     </Link>
                     <DropdownMenuItem 
-                      onClick={() => logoutMutation.mutate()}
+                      onClick={handleLogout}
                       data-testid="menu-logout"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
@@ -139,16 +118,13 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/login">
-                  <Button variant="ghost" data-testid="button-login">
-                    Connexion
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="default" data-testid="button-signup">
-                    S'inscrire
-                  </Button>
-                </Link>
+                <Button 
+                  variant="default" 
+                  onClick={() => window.location.href = '/api/login'}
+                  data-testid="button-login"
+                >
+                  Se connecter
+                </Button>
               </>
             )}
           </div>
@@ -202,10 +178,7 @@ export default function Navbar() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => {
-                    logoutMutation.mutate();
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={handleLogout}
                   data-testid="button-logout-mobile"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -241,24 +214,14 @@ export default function Navbar() {
                     Trouver des missions
                   </Button>
                 </Link>
-                <Link href="/login">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    data-testid="button-login-mobile"
-                  >
-                    Connexion
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button
-                    variant="default"
-                    className="w-full"
-                    data-testid="button-signup-mobile"
-                  >
-                    S'inscrire
-                  </Button>
-                </Link>
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={() => window.location.href = '/api/login'}
+                  data-testid="button-login-mobile"
+                >
+                  Se connecter
+                </Button>
               </div>
             )}
           </div>
