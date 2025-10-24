@@ -550,6 +550,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User/Profile routes
+  app.get("/api/users", async (req, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      // Remove passwords from all users
+      const usersWithoutPasswords = allUsers.map(({ password, ...user }) => user);
+      res.send(usersWithoutPasswords);
+    } catch (error) {
+      res.status(500).send({ error: "Erreur serveur" });
+    }
+  });
+
   app.get("/api/users/:id", async (req, res) => {
     try {
       const user = await storage.getUser(req.params.id);
