@@ -42,14 +42,6 @@ export default function Help() {
       answer: "Après chaque mission, le client peut laisser un avis et une note. Plus vous accumulez d'avis positifs, plus votre profil gagne en crédibilité. Soyez professionnel, respectez les délais et livrez un travail de qualité pour obtenir d'excellentes évaluations."
     },
     {
-      question: "Que faire en cas de litige ?",
-      answer: "En cas de désaccord avec un client ou un freelance, essayez d'abord de résoudre le problème à l'amiable. Si cela n'est pas possible, contactez notre équipe support via la page de contact. Nous ferons de notre mieux pour médier et trouver une solution équitable."
-    },
-    {
-      question: "Comment supprimer mon compte ?",
-      answer: "Connectez-vous à votre compte, allez dans les paramètres de profil et cliquez sur 'Supprimer mon compte'. Attention, cette action est irréversible et supprimera toutes vos données, missions et candidatures."
-    },
-    {
       question: "HavJob prélève-t-il des commissions ?",
       answer: "Actuellement, HavJob ne prélève aucune commission sur les missions. La plateforme est gratuite pour publier et postuler aux missions. Seuls les services de boost sont payants."
     },
@@ -95,13 +87,16 @@ export default function Help() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Besoin d'aide supplémentaire ?</h3>
               <p className="text-muted-foreground mb-4">
-                Notre équipe est là pour vous aider
+                Rejoignez notre groupe WhatsApp pour obtenir de l'aide
               </p>
-              <Link href="/contact">
-                <Button variant="outline" data-testid="button-contact">
-                  Nous contacter
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                data-testid="button-contact"
+                onClick={() => window.open("https://chat.whatsapp.com/DcgpfrIRpOH6oNSnnV55i8", "_blank")}
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Rejoindre le groupe
+              </Button>
             </CardContent>
           </Card>
 
@@ -112,13 +107,16 @@ export default function Help() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Signaler un problème</h3>
               <p className="text-muted-foreground mb-4">
-                Aidez-nous à améliorer la plateforme
+                Contactez-nous sur WhatsApp pour signaler un problème
               </p>
-              <Link href="/contact">
-                <Button variant="outline" data-testid="button-report">
-                  Signaler
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                data-testid="button-report"
+                onClick={() => window.open("https://chat.whatsapp.com/DcgpfrIRpOH6oNSnnV55i8", "_blank")}
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Contacter le support
+              </Button>
             </CardContent>
           </Card>
         </div>

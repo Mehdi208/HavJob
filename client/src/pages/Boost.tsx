@@ -3,13 +3,15 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Zap, TrendingUp, Eye } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Check, Zap, TrendingUp, Eye, Briefcase, User as UserIcon } from "lucide-react";
 
 export default function Boost() {
   const plans = [
     {
       days: 1,
       price: 5000,
+      url: "https://chariow.com/s/havjob/5000",
       popular: false,
       features: [
         "Visibilité maximale pendant 24h",
@@ -21,6 +23,7 @@ export default function Boost() {
     {
       days: 3,
       price: 12000,
+      url: "https://chariow.com/s/havjob/12000",
       popular: false,
       features: [
         "Visibilité maximale pendant 3 jours",
@@ -32,6 +35,7 @@ export default function Boost() {
     {
       days: 7,
       price: 25000,
+      url: "https://chariow.com/s/havjob/25000",
       popular: true,
       features: [
         "Visibilité maximale pendant 7 jours",
@@ -44,6 +48,7 @@ export default function Boost() {
     {
       days: 15,
       price: 45000,
+      url: "https://chariow.com/s/havjob/45000",
       popular: false,
       features: [
         "Visibilité maximale pendant 15 jours",
@@ -55,6 +60,7 @@ export default function Boost() {
     {
       days: 30,
       price: 80000,
+      url: "https://chariow.com/s/havjob/80000",
       popular: false,
       features: [
         "Visibilité maximale pendant 30 jours",
@@ -66,8 +72,8 @@ export default function Boost() {
     },
   ];
 
-  const handleBoost = (days: number, price: number) => {
-    window.open("https://chariow.com/havjob", "_blank");
+  const handleBoost = (url: string) => {
+    window.open(url, "_blank");
   };
 
   return (
@@ -128,56 +134,130 @@ export default function Boost() {
           </Card>
         </div>
 
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Choisissez votre formule
-        </h2>
+        <Tabs defaultValue="mission" className="w-full">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-12">
+            <TabsTrigger value="mission" data-testid="tab-boost-mission">
+              <Briefcase className="h-4 w-4 mr-2" />
+              Booster une mission
+            </TabsTrigger>
+            <TabsTrigger value="profile" data-testid="tab-boost-profile">
+              <UserIcon className="h-4 w-4 mr-2" />
+              Booster mon profil
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {plans.map((plan) => (
-            <Card
-              key={plan.days}
-              className={`relative hover-elevate ${
-                plan.popular ? "border-primary shadow-lg" : ""
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-primary">Le plus populaire</Badge>
-                </div>
-              )}
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-3xl font-bold mb-2">{plan.days}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {plan.days === 1 ? "jour" : "jours"}
-                  </p>
-                  <div className="text-3xl font-bold text-primary mb-1">
-                    {plan.price.toLocaleString()}
-                  </div>
-                  <p className="text-sm text-muted-foreground">FCFA</p>
-                </div>
+          <TabsContent value="mission">
+            <h2 className="text-3xl font-bold text-center mb-4">
+              Boostez votre mission
+            </h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Augmentez la visibilité de votre mission pour recevoir plus de candidatures de freelances qualifiés
+            </p>
 
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  className="w-full"
-                  variant={plan.popular ? "default" : "outline"}
-                  onClick={() => handleBoost(plan.days, plan.price)}
-                  data-testid={`button-boost-${plan.days}`}
+            <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {plans.map((plan) => (
+                <Card
+                  key={`mission-${plan.days}`}
+                  className={`relative hover-elevate ${
+                    plan.popular ? "border-primary shadow-lg" : ""
+                  }`}
                 >
-                  Booster maintenant
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <Badge className="bg-primary">Le plus populaire</Badge>
+                    </div>
+                  )}
+                  <CardContent className="p-6">
+                    <div className="text-center mb-6">
+                      <h3 className="text-3xl font-bold mb-2">{plan.days}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {plan.days === 1 ? "jour" : "jours"}
+                      </p>
+                      <div className="text-3xl font-bold text-primary mb-1">
+                        {plan.price.toLocaleString()}
+                      </div>
+                      <p className="text-sm text-muted-foreground">FCFA</p>
+                    </div>
+
+                    <ul className="space-y-3 mb-6">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Button
+                      className="w-full"
+                      variant={plan.popular ? "default" : "outline"}
+                      onClick={() => handleBoost(plan.url)}
+                      data-testid={`button-boost-mission-${plan.days}`}
+                    >
+                      Booster maintenant
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="profile">
+            <h2 className="text-3xl font-bold text-center mb-4">
+              Boostez votre profil
+            </h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              Mettez en avant votre profil de freelance pour être vu par plus de clients potentiels
+            </p>
+
+            <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {plans.map((plan) => (
+                <Card
+                  key={`profile-${plan.days}`}
+                  className={`relative hover-elevate ${
+                    plan.popular ? "border-primary shadow-lg" : ""
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <Badge className="bg-primary">Le plus populaire</Badge>
+                    </div>
+                  )}
+                  <CardContent className="p-6">
+                    <div className="text-center mb-6">
+                      <h3 className="text-3xl font-bold mb-2">{plan.days}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {plan.days === 1 ? "jour" : "jours"}
+                      </p>
+                      <div className="text-3xl font-bold text-primary mb-1">
+                        {plan.price.toLocaleString()}
+                      </div>
+                      <p className="text-sm text-muted-foreground">FCFA</p>
+                    </div>
+
+                    <ul className="space-y-3 mb-6">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Button
+                      className="w-full"
+                      variant={plan.popular ? "default" : "outline"}
+                      onClick={() => handleBoost(plan.url)}
+                      data-testid={`button-boost-profile-${plan.days}`}
+                    >
+                      Booster maintenant
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
 
         <Card className="mt-16 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
           <CardContent className="p-8">

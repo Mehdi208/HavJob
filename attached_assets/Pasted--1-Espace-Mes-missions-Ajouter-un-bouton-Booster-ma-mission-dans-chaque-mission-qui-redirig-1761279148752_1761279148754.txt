@@ -1,0 +1,149 @@
+🧩 1. Espace “Mes missions”
+
+Ajouter un bouton “Booster ma mission” dans chaque mission, qui redirige vers la page des offres de boost.
+
+Permettre à l’utilisateur de modifier le statut de sa mission :
+
+“Toujours d’actualité”
+
+“Quelqu’un a été retenu”
+
+Le statut doit être visible publiquement sur la fiche mission.
+
+🔐 2. Connexion
+
+Garder uniquement la méthode de connexion par téléphone sur tout le site.
+
+Vérifier que tous les boutons ou liens “Se connecter / S’inscrire” redirigent bien vers cette méthode.
+
+Supprimer toute autre forme de connexion (email, Google, etc.).
+
+🧾 3. Page “Publier une mission”
+
+Ajouter la catégorie “Stage”.
+
+Ajouter la catégorie “Autre” avec un champ libre pour que l’utilisateur puisse saisir manuellement sa propre catégorie.
+
+Le champ “Budget” doit être vide par défaut (ne pas afficher “0”).
+
+Supprimer le champ “Durée estimée”.
+
+Supprimer les minimums de caractères pour les champs “Titre de la mission” et “Description”.
+
+Corriger le bug qui empêche de publier une mission actuellement.
+
+Lorsqu’un utilisateur publie une mission :
+
+Afficher une popup lui demandant :
+
+“Souhaitez-vous booster votre mission ?”
+
+Bouton “Oui” → redirige vers la page des offres de boost.
+
+Bouton “Non” → publie la mission normalement.
+
+💬 4. Postulation aux missions
+
+Lorsqu’un freelance clique sur le bouton “Postuler”, il doit être redirigé vers la conversation WhatsApp du client avec un message prérempli :
+
+Bonjour [Nom du client], je suis [Nom du freelance] et je suis intéressé par votre mission “[Titre de la mission]”.
+
+L’URL WhatsApp doit utiliser le format :
+https://wa.me/225[numéro_du_client]
+
+👤 5. Profils utilisateurs / freelances
+
+Permettre aux utilisateurs de voir le profil public d’un freelance.
+
+Sur le profil public :
+
+Ajouter la possibilité de noter le freelance (sur 5 étoiles).
+
+Ajouter la possibilité de laisser un avis texte.
+
+Ces avis et notes doivent être visibles par tout le monde.
+
+Sur le dashboard du freelance, afficher :
+
+Ses notes moyennes.
+
+Les avis reçus.
+
+Ajouter la possibilité pour le freelance de :
+
+Entrer ses compétences.
+
+Importer son CV au format .pdf ou .docx.
+Ce CV doit pouvoir être téléchargé et consulté par les autres utilisateurs.
+
+Ajouter sur le profil un bouton “Booster mon profil”, qui redirige vers la page des offres de boost.
+
+🧰 6. Page “Devenir Freelance”
+
+Supprimer le bouton “Créer mon compte freelance”.
+
+Garder uniquement le bouton “Parcourir les missions”.
+
+Dans la section “Dans quels domaines pouvez-vous travailler ?” :
+
+Dans la dernière box, préciser qu’il existe d’autres domaines où l’on peut travailler.
+
+Adapter la section “Prêt à commencer votre aventure freelance ?” :
+
+Modifier le sous-titre, car il parle actuellement de “créer un compte freelance gratuitement”.
+
+Le freelance peut directement postuler aux offres sans avoir à créer un compte séparé.
+
+🆘 7. Page “Centre d’aide”
+
+Dans la section FAQ, supprimer les questions :
+
+“Que faire en cas de litige ?”
+
+“Comment supprimer mon compte ?”
+
+Dans la box “Besoin d’aide supplémentaire” :
+
+Le bouton “Nous contacter” doit rediriger vers le groupe WhatsApp :
+👉 https://chat.whatsapp.com/DcgpfrIRpOH6oNSnnV55i8?mode=wwt
+
+Dans la box “Signaler”, rediriger le bouton vers le même lien WhatsApp.
+
+⚡ 8. Offres de Boost (page déjà existante)
+
+➡️ La page existe déjà, il faut simplement la réaménager légèrement (présentation plus claire, boutons fonctionnels, design harmonisé).
+Voici les liens des différentes offres :
+
+🟢 Boost PROFIL
+
+24h : https://havjob-boost.maketou.com/fr/products/boost-24h
+
+3 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8
+
+7 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-4
+
+15 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8
+
+30 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8-6
+
+🔵 Boost MISSION
+
+24h : https://havjob-boost.maketou.com/fr/products/boost-24h-0
+
+3 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9
+
+7 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0
+
+15 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3
+
+30 jours : https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8-6-5
+
+🧠 Remarques générales
+
+Tout doit fonctionner avec la base de données intégrée Replit.
+
+Les redirections internes doivent être vérifiées et corrigées si nécessaire.
+
+Le système doit rester simple, fluide et responsive (desktop + mobile).
+
+Aucun autre backend externe ne doit être ajouté.

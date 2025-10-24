@@ -29,7 +29,7 @@ export default function Navbar() {
   });
 
   const handleLogout = () => {
-    // Replit Auth logout - navigate to /api/logout
+    // Logout - navigate to /api/logout
     window.location.href = "/api/logout";
   };
 
@@ -118,28 +118,16 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="default" data-testid="button-login">
-                      Se connecter
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Choisir la méthode</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <Link href="/connexion-telephone">
-                      <DropdownMenuItem data-testid="menu-login-phone">
-                        Avec téléphone
-                      </DropdownMenuItem>
-                    </Link>
-                    <DropdownMenuItem
-                      onClick={() => window.location.href = '/api/login'}
-                      data-testid="menu-login-oauth"
-                    >
-                      Avec Google / GitHub / X
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Link href="/inscription-telephone">
+                  <Button variant="outline" data-testid="button-register">
+                    S'inscrire
+                  </Button>
+                </Link>
+                <Link href="/connexion-telephone">
+                  <Button variant="default" data-testid="button-login">
+                    Se connecter
+                  </Button>
+                </Link>
               </>
             )}
           </div>
@@ -229,25 +217,25 @@ export default function Navbar() {
                     Trouver des missions
                   </Button>
                 </Link>
-                <div className="border-t pt-2 mt-2">
-                  <p className="text-sm text-muted-foreground px-4 pb-2">Se connecter</p>
-                  <Link href="/connexion-telephone">
+                <div className="border-t pt-2 mt-2 flex flex-col gap-2">
+                  <Link href="/inscription-telephone">
                     <Button
                       variant="outline"
                       className="w-full"
-                      data-testid="button-login-phone-mobile"
+                      data-testid="button-register-mobile"
                     >
-                      Avec téléphone
+                      S'inscrire
                     </Button>
                   </Link>
-                  <Button
-                    variant="default"
-                    className="w-full mt-2"
-                    onClick={() => window.location.href = '/api/login'}
-                    data-testid="button-login-oauth-mobile"
-                  >
-                    Avec Google / GitHub / X
-                  </Button>
+                  <Link href="/connexion-telephone">
+                    <Button
+                      variant="default"
+                      className="w-full"
+                      data-testid="button-login-mobile"
+                    >
+                      Se connecter
+                    </Button>
+                  </Link>
                 </div>
               </div>
             )}

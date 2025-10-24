@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -5,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertMissionSchema, type InsertMission } from "@shared/schema";
@@ -25,11 +27,15 @@ const categories = [
   "Photographie",
   "Services",
   "Conseil",
+  "Stage",
+  "Autre",
 ];
 
 export default function PublishMission() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [showBoostDialog, setShowBoostDialog] = useState(false);
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   const { data: currentUser } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -41,7 +47,8 @@ export default function PublishMission() {
       title: "",
       description: "",
       category: "",
-      budget: 0,
+      customCategory: "",
+      budget: undefined as any,
       budgetType: "fixed",
       location: "",
       isRemote: false,
@@ -56,12 +63,8 @@ export default function PublishMission() {
       return await apiRequest("POST", "/api/missions", data);
     },
     onSuccess: () => {
-      toast({
-        title: "Mission publiée",
-        description: "Votre mission a été publiée avec succès !",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
-      setLocation("/");
+      // Show boost dialog instead of redirecting immediately
+      setShowBoostDialog(true);
     },
     onError: (error: any) => {
       toast({
@@ -78,7 +81,7 @@ export default function PublishMission() {
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <p className="text-muted-foreground">Vous devez être connecté pour publier une mission</p>
-          <Button onClick={() => window.location.href = "/api/login"} data-testid="button-login-prompt">
+          <Button onClick={() => setLocation("/connexion-telephone")} data-testid="button-login-prompt">
             Se connecter
           </Button>
         </div>
@@ -88,6 +91,29 @@ export default function PublishMission() {
 
   const onSubmit = (data: InsertMission) => {
     publishMutation.mutate(data);
+  };
+
+  const handleBoostDialogClose = (boost: boolean) => {
+    setShowBoostDialog(false);
+    toast({
+      title: "Mission publiée",
+      description: "Votre mission a été publiée avec succès !",
+    });
+    queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
+    
+    if (boost) {
+      setLocation("/boost");
+    } else {
+      setLocation("/dashboard");
+    }
+  };
+
+  const handleCategoryChange = (value: string) => {
+    form.setValue("category", value);
+    setShowCustomCategory(value === "Autre");
+    if (value !== "Autre") {
+      form.setValue("customCategory", "");
+    }
   };
 
   return (
@@ -120,9 +146,6 @@ export default function PublishMission() {
                         data-testid="input-title"
                       />
                     </FormControl>
-                    <FormDescription>
-                      Minimum 10 caractères
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -134,7 +157,7 @@ export default function PublishMission() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Catégorie *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={handleCategoryChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-category">
                           <SelectValue placeholder="Sélectionnez une catégorie" />
@@ -153,6 +176,27 @@ export default function PublishMission() {
                 )}
               />
 
+              {showCustomCategory && (
+                <FormField
+                  control={form.control}
+                  name="customCategory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Précisez votre catégorie *</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value || ""}
+                          placeholder="Ex: Traduction, Comptabilité, Jardinage..."
+                          data-testid="input-custom-category"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               <FormField
                 control={form.control}
                 name="description"
@@ -167,9 +211,6 @@ export default function PublishMission() {
                         data-testid="input-description"
                       />
                     </FormControl>
-                    <FormDescription>
-                      Minimum 50 caractères
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -186,40 +227,17 @@ export default function PublishMission() {
                         <Input
                           {...field}
                           type="number"
-                          placeholder="150000"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          placeholder="Ex: 150000"
+                          value={field.value || ""}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                           data-testid="input-budget"
                         />
                       </FormControl>
-                      <FormDescription>
-                        Minimum 1000 FCFA
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="duration"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Durée estimée</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value || ""}
-                          placeholder="Ex: 2-3 mois"
-                          data-testid="input-duration"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="location"
@@ -238,31 +256,31 @@ export default function PublishMission() {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="isRemote"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          Télétravail
-                        </FormLabel>
-                        <FormDescription>
-                          Mission réalisable à distance
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value || false}
-                          onCheckedChange={field.onChange}
-                          data-testid="switch-remote"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
               </div>
+
+              <FormField
+                control={form.control}
+                name="isRemote"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Télétravail
+                      </FormLabel>
+                      <FormDescription>
+                        Mission réalisable à distance
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value || false}
+                        onCheckedChange={field.onChange}
+                        data-testid="switch-remote"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               <div className="flex gap-4">
                 <Button
@@ -285,6 +303,33 @@ export default function PublishMission() {
           </Form>
         </Card>
       </div>
+
+      {/* Boost Dialog */}
+      <Dialog open={showBoostDialog} onOpenChange={setShowBoostDialog}>
+        <DialogContent data-testid="dialog-boost">
+          <DialogHeader>
+            <DialogTitle>Mission publiée avec succès !</DialogTitle>
+            <DialogDescription>
+              Souhaitez-vous booster votre mission pour la rendre plus visible ?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => handleBoostDialogClose(false)}
+              data-testid="button-boost-no"
+            >
+              Non, merci
+            </Button>
+            <Button
+              onClick={() => handleBoostDialogClose(true)}
+              data-testid="button-boost-yes"
+            >
+              Oui, booster ma mission
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

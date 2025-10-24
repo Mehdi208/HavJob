@@ -1,23 +1,19 @@
 import { useRoute, useLocation, Link } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { MapPin, Clock, DollarSign, Briefcase, Star, Zap, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Clock, DollarSign, Briefcase, Star, Zap, ArrowLeft, MessageCircle } from "lucide-react";
 import type { Mission, User } from "@shared/schema";
 
 export default function MissionDetail() {
   const [, params] = useRoute("/missions/:id");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [coverLetter, setCoverLetter] = useState("");
 
   const { data: mission, isLoading } = useQuery<Mission>({
     queryKey: ["/api/missions", params?.id],
@@ -28,28 +24,10 @@ export default function MissionDetail() {
     queryKey: ["/api/auth/user"],
   });
 
-  const applyMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", `/api/missions/${params?.id}/apply`, {
-        coverLetter,
-        missionId: params?.id,
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Candidature envoyée",
-        description: "Votre candidature a été envoyée avec succès !",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/missions", params?.id] });
-      setCoverLetter("");
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message || "Impossible d'envoyer votre candidature",
-      });
-    },
+  // Fetch the client (mission owner) information
+  const { data: client } = useQuery<User>({
+    queryKey: ["/api/users", mission?.clientId],
+    enabled: !!mission?.clientId,
   });
 
   if (isLoading) {
@@ -94,7 +72,54 @@ export default function MissionDetail() {
     return `Il y a ${diffDays} jours`;
   };
 
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      open: "Ouverte",
+      toujours_actualite: "Toujours d'actualité",
+      quelqu_un_retenu: "Quelqu'un a été retenu",
+      in_progress: "En cours",
+      completed: "Terminée",
+      cancelled: "Annulée",
+    };
+    return labels[status] || status;
+  };
+
   const isOwnMission = currentUser && mission.clientId === currentUser.id;
+
+  // Create WhatsApp redirect URL
+  const createWhatsAppUrl = () => {
+    if (!client || !currentUser || !client.phoneNumber) return "#";
+    
+    // Sanitize: keep only digits
+    let cleanNumber = client.phoneNumber.replace(/\D/g, "");
+    
+    // Remove leading zeros
+    cleanNumber = cleanNumber.replace(/^0+/, "");
+    
+    // If number already starts with country code 225, use as-is
+    // Otherwise prepend 225 (Ivory Coast country code)
+    if (!cleanNumber.startsWith("225")) {
+      cleanNumber = "225" + cleanNumber;
+    }
+    
+    // Create pre-filled message
+    const message = encodeURIComponent(
+      `Bonjour ${client.fullName}, je suis ${currentUser.fullName} et je suis intéressé par votre mission "${mission.title}".`
+    );
+    
+    // Return WhatsApp URL
+    return `https://wa.me/${cleanNumber}?text=${message}`;
+  };
+
+  const handleWhatsAppContact = () => {
+    if (!currentUser) {
+      setLocation("/connexion-telephone");
+      return;
+    }
+    
+    const url = createWhatsAppUrl();
+    window.open(url, "_blank");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -118,13 +143,18 @@ export default function MissionDetail() {
                 </Badge>
               )}
               
-              <h1 className="text-3xl font-bold text-foreground mb-4" data-testid="text-mission-title">
-                {mission.title}
-              </h1>
+              <div className="flex items-start justify-between mb-4">
+                <h1 className="text-3xl font-bold text-foreground flex-1" data-testid="text-mission-title">
+                  {mission.title}
+                </h1>
+                <Badge variant="secondary" className="ml-4">
+                  {getStatusLabel(mission.status)}
+                </Badge>
+              </div>
 
               <div className="flex flex-wrap gap-3 mb-6">
                 <Badge variant="secondary" className="text-sm">
-                  {mission.category}
+                  {mission.category === "Autre" && mission.customCategory ? mission.customCategory : mission.category}
                 </Badge>
                 {mission.isRemote && (
                   <Badge variant="outline" className="text-sm">
@@ -146,10 +176,12 @@ export default function MissionDetail() {
                   <MapPin className="h-4 w-4" />
                   <span>{mission.location || "Non spécifié"}</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{mission.duration || "Non spécifié"}</span>
-                </div>
+                {mission.duration && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>{mission.duration}</span>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-border pt-6">
@@ -175,17 +207,17 @@ export default function MissionDetail() {
           <div className="lg:col-span-1">
             <Card className="p-6 sticky top-20">
               <h3 className="font-semibold text-foreground mb-4">
-                {isOwnMission ? "Votre mission" : "Postuler à cette mission"}
+                {isOwnMission ? "Votre mission" : "Contacter le client"}
               </h3>
 
               {!currentUser ? (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Vous devez être connecté pour postuler à cette mission
+                    Vous devez être connecté pour contacter le client
                   </p>
                   <Button 
                     className="w-full" 
-                    onClick={() => window.location.href = "/api/login"} 
+                    onClick={() => setLocation("/connexion-telephone")} 
                     data-testid="button-login-prompt"
                   >
                     Se connecter
@@ -194,33 +226,49 @@ export default function MissionDetail() {
               ) : isOwnMission ? (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    C'est votre mission. Vous pouvez la modifier ou voir les candidatures reçues.
+                    C'est votre mission. Vous pouvez la gérer depuis votre dashboard.
                   </p>
-                  <Button variant="outline" className="w-full">
-                    Voir les candidatures ({mission.applicantsCount || 0})
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setLocation("/dashboard")}
+                    data-testid="button-manage-mission"
+                  >
+                    Gérer ma mission
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">
-                      Lettre de motivation
-                    </label>
-                    <Textarea
-                      placeholder="Expliquez pourquoi vous êtes le meilleur candidat pour cette mission..."
-                      value={coverLetter}
-                      onChange={(e) => setCoverLetter(e.target.value)}
-                      className="min-h-32"
-                      data-testid="input-cover-letter"
-                    />
-                  </div>
+                  {client && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="text-lg">
+                          {client.fullName?.charAt(0) || "C"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-foreground">{client.fullName}</p>
+                        {client.rating !== null && client.rating > 0 && (
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Star className="h-3 w-3 fill-current text-yellow-500" />
+                            <span>{client.rating}/5</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <p className="text-sm text-muted-foreground">
+                    Contactez le client directement sur WhatsApp pour discuter de cette mission
+                  </p>
+                  
                   <Button
-                    className="w-full"
-                    onClick={() => applyMutation.mutate()}
-                    disabled={applyMutation.isPending || !coverLetter.trim()}
-                    data-testid="button-apply"
+                    className="w-full gap-2 bg-green-600 hover:bg-green-700"
+                    onClick={handleWhatsAppContact}
+                    data-testid="button-whatsapp-contact"
                   >
-                    {applyMutation.isPending ? "Envoi..." : "Envoyer ma candidature"}
+                    <MessageCircle className="h-4 w-4" />
+                    Contacter sur WhatsApp
                   </Button>
                 </div>
               )}

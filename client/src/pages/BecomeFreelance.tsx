@@ -60,18 +60,11 @@ export default function BecomeFreelance() {
             Devenez freelance sur HavJob
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Rejoignez une communauté de freelances talentueux et trouvez des missions qui correspondent à vos compétences
+            Rejoignez une communauté de freelances talentueux et trouvez des missions qui correspondent à vos compétences. Inscrivez-vous et commencez à postuler dès maintenant !
           </p>
           <div className="flex gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={() => window.location.href = "/api/login"} 
-              data-testid="button-register"
-            >
-              Créer mon compte freelance
-            </Button>
             <Link href="/missions">
-              <Button size="lg" variant="outline" data-testid="button-browse-missions">
+              <Button size="lg" data-testid="button-browse-missions">
                 Parcourir les missions
               </Button>
             </Link>
@@ -111,6 +104,11 @@ export default function BecomeFreelance() {
                 </CardContent>
               </Card>
             ))}
+            <Card className="hover-elevate text-center bg-muted/50">
+              <CardContent className="p-6">
+                <p className="font-medium text-muted-foreground">Et bien d'autres domaines...</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -120,15 +118,16 @@ export default function BecomeFreelance() {
           Prêt à commencer votre aventure freelance ?
         </h2>
         <p className="text-lg text-muted-foreground mb-8">
-          Créez votre compte gratuitement et commencez à postuler aux missions dès aujourd'hui
+          Parcourez les missions disponibles et contactez directement les clients pour démarrer votre activité freelance
         </p>
-        <Button 
-          size="lg" 
-          onClick={() => window.location.href = "/api/login"} 
-          data-testid="button-get-started"
-        >
-          Commencer maintenant
-        </Button>
+        <Link href="/missions">
+          <Button 
+            size="lg" 
+            data-testid="button-get-started"
+          >
+            Parcourir les missions
+          </Button>
+        </Link>
       </div>
 
       <Footer />

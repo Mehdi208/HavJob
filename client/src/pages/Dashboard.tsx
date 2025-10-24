@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,11 +8,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Briefcase, Star, Heart, Settings, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Briefcase, Star, Heart, Settings, Plus, Zap, Edit } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { User, Mission } from "@shared/schema";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+  const [newStatus, setNewStatus] = useState("");
 
   const { data: currentUser, isLoading } = useQuery<User>({
     queryKey: ["/api/auth/user"],
@@ -22,6 +31,27 @@ export default function Dashboard() {
     select: (missions) => 
       currentUser ? missions.filter(m => m.clientId === currentUser.id) : [],
     enabled: !!currentUser,
+  });
+
+  const updateMissionMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      return await apiRequest("PATCH", `/api/missions/${id}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
+      toast({
+        title: "Statut mis à jour",
+        description: "Le statut de votre mission a été mis à jour avec succès",
+      });
+      setStatusDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de mettre à jour le statut",
+      });
+    },
   });
 
   if (isLoading) {
@@ -41,13 +71,46 @@ export default function Dashboard() {
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <p className="text-muted-foreground">Vous devez être connecté pour accéder au dashboard</p>
-          <Button onClick={() => window.location.href = "/api/login"} data-testid="button-login-prompt">
+          <Button onClick={() => setLocation("/connexion-telephone")} data-testid="button-login-prompt">
             Se connecter
           </Button>
         </div>
       </div>
     );
   }
+
+  const openStatusDialog = (mission: Mission) => {
+    setSelectedMission(mission);
+    setNewStatus(mission.status);
+    setStatusDialogOpen(true);
+  };
+
+  const handleStatusUpdate = () => {
+    if (selectedMission && newStatus) {
+      updateMissionMutation.mutate({
+        id: selectedMission.id,
+        status: newStatus,
+      });
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      open: "Ouverte",
+      toujours_actualite: "Toujours d'actualité",
+      quelqu_un_retenu: "Quelqu'un a été retenu",
+      in_progress: "En cours",
+      completed: "Terminée",
+      cancelled: "Annulée",
+    };
+    return labels[status] || status;
+  };
+
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    if (status === "open" || status === "toujours_actualite") return "default";
+    if (status === "quelqu_un_retenu" || status === "completed") return "secondary";
+    return "outline";
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -59,7 +122,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
                 <AvatarFallback className="text-2xl">
-                  {currentUser.fullName.charAt(0)}
+                  {currentUser.fullName?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -74,9 +137,9 @@ export default function Dashboard() {
                 </Badge>
               </div>
             </div>
-            <Button variant="outline" className="gap-2">
-              <Settings className="h-4 w-4" />
-              Paramètres
+            <Button variant="outline" className="gap-2" onClick={() => setLocation("/boost")} data-testid="button-boost-profile">
+              <Zap className="h-4 w-4" />
+              Booster mon profil
             </Button>
           </div>
         </div>
@@ -98,12 +161,12 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Candidatures
+                Note moyenne
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                0
+                {currentUser.rating || 0}/5
               </div>
             </CardContent>
           </Card>
@@ -111,12 +174,12 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Favoris
+                Avis reçus
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                0
+                {currentUser.reviewCount || 0}
               </div>
             </CardContent>
           </Card>
@@ -161,15 +224,15 @@ export default function Dashboard() {
             ) : (
               <div className="grid gap-4">
                 {myMissions.map((mission) => (
-                  <Card key={mission.id} className="p-6 hover-elevate cursor-pointer" onClick={() => setLocation(`/missions/${mission.id}`)}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                  <Card key={mission.id} className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 cursor-pointer" onClick={() => setLocation(`/missions/${mission.id}`)}>
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="text-lg font-semibold text-foreground">
                             {mission.title}
                           </h3>
-                          <Badge variant={mission.status === "open" ? "default" : "secondary"}>
-                            {mission.status === "open" ? "Ouverte" : mission.status}
+                          <Badge variant={getStatusVariant(mission.status)}>
+                            {getStatusLabel(mission.status)}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
@@ -180,8 +243,30 @@ export default function Dashboard() {
                             {new Intl.NumberFormat("fr-FR").format(mission.budget)} FCFA
                           </span>
                           <span>{mission.applicantsCount || 0} candidatures</span>
-                          <span>{mission.category}</span>
+                          <span>{mission.category === "Autre" && mission.customCategory ? mission.customCategory : mission.category}</span>
                         </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => openStatusDialog(mission)}
+                          data-testid={`button-edit-status-${mission.id}`}
+                        >
+                          <Edit className="h-4 w-4" />
+                          Modifier statut
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="gap-2"
+                          onClick={() => setLocation("/boost")}
+                          data-testid={`button-boost-mission-${mission.id}`}
+                        >
+                          <Zap className="h-4 w-4" />
+                          Booster
+                        </Button>
                       </div>
                     </div>
                   </Card>
@@ -207,6 +292,49 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Status Update Dialog */}
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent data-testid="dialog-update-status">
+          <DialogHeader>
+            <DialogTitle>Modifier le statut de la mission</DialogTitle>
+            <DialogDescription>
+              Mettez à jour le statut pour informer les freelances de l'avancement
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={newStatus} onValueChange={setNewStatus}>
+              <SelectTrigger data-testid="select-mission-status">
+                <SelectValue placeholder="Sélectionnez un statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="open">Ouverte</SelectItem>
+                <SelectItem value="toujours_actualite">Toujours d'actualité</SelectItem>
+                <SelectItem value="quelqu_un_retenu">Quelqu'un a été retenu</SelectItem>
+                <SelectItem value="in_progress">En cours</SelectItem>
+                <SelectItem value="completed">Terminée</SelectItem>
+                <SelectItem value="cancelled">Annulée</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setStatusDialogOpen(false)}
+              data-testid="button-cancel-status"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleStatusUpdate}
+              disabled={updateMissionMutation.isPending}
+              data-testid="button-save-status"
+            >
+              {updateMissionMutation.isPending ? "Mise à jour..." : "Sauvegarder"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

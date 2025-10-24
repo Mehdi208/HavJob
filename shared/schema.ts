@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const userRoleEnum = pgEnum("user_role", ["freelance", "client", "both"]);
 export const authMethodEnum = pgEnum("auth_method", ["replit", "phone"]);
-export const missionStatusEnum = pgEnum("mission_status", ["open", "in_progress", "completed", "cancelled"]);
+export const missionStatusEnum = pgEnum("mission_status", ["open", "toujours_actualite", "quelqu_un_retenu", "in_progress", "completed", "cancelled"]);
 export const applicationStatusEnum = pgEnum("application_status", ["pending", "accepted", "rejected", "withdrawn"]);
 export const boostDurationEnum = pgEnum("boost_duration", ["1", "3", "7", "15", "30"]);
 
@@ -24,7 +24,7 @@ export const sessions = pgTable(
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   // Authentication method: 'replit' for OAuth, 'phone' for phone/password
-  authMethod: authMethodEnum("auth_method").notNull().default("replit"),
+  authMethod: authMethodEnum("auth_method").notNull().default("phone"),
   // Replit Auth fields (nullable for phone auth users)
   email: varchar("email", { length: 255 }).unique(),
   firstName: varchar("first_name", { length: 100 }),
@@ -39,6 +39,7 @@ export const users = pgTable("users", {
   skills: text("skills").array(),
   location: varchar("location", { length: 100 }),
   avatar: text("avatar"),
+  cvUrl: text("cv_url"),
   rating: integer("rating").default(0),
   reviewCount: integer("review_count").default(0),
   completedMissions: integer("completed_missions").default(0),
@@ -55,6 +56,7 @@ export const missions = pgTable("missions", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   category: varchar("category", { length: 100 }).notNull(),
+  customCategory: text("custom_category"),
   budget: integer("budget").notNull(),
   budgetType: varchar("budget_type", { length: 20 }).default("fixed"),
   location: varchar("location", { length: 100 }),
@@ -159,9 +161,10 @@ export const insertMissionSchema = createInsertSchema(missions).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  title: z.string().min(10, "Le titre doit contenir au moins 10 caractères"),
-  description: z.string().min(50, "La description doit contenir au moins 50 caractères"),
-  budget: z.number().min(1000, "Le budget minimum est de 1000 FCFA"),
+  title: z.string().min(1, "Le titre est requis"),
+  description: z.string().min(1, "La description est requise"),
+  budget: z.number().min(0, "Le budget doit être un nombre positif"),
+  customCategory: z.string().optional(),
 });
 
 export const insertApplicationSchema = createInsertSchema(applications).omit({
