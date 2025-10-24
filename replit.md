@@ -6,6 +6,20 @@ HavJob is a web-based freelance marketplace platform designed specifically for t
 
 The application targets a mobile-first audience in Côte d'Ivoire, emphasizing accessibility, trust, and transparency through clear pricing, visible ratings, and authentic user profiles.
 
+## Recent Changes
+
+**October 24, 2025:**
+- Fixed mobile registration bug (HTTP 500) caused by missing database columns
+- Synchronized PostgreSQL schema with Drizzle definitions using `npm run db:push`
+- Added missing fields to database: `cv_url` (users), `custom_category` (missions)
+- Updated all storage implementations (MemStorage, PostgresStorage) to include cvUrl and customCategory
+- Mobile registration endpoint now fully operational with comprehensive E2E tests validating:
+  - Valid user registration (201 Created)
+  - Duplicate phone number prevention (400 Bad Request)
+  - Password validation (minimum 6 characters)
+  - JWT token generation (access + refresh tokens)
+  - Protected endpoint authentication (GET /api/mobile/user)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
