@@ -6,70 +6,101 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, Briefcase, AlertTriangle, TrendingUp, Lock, Shield, Zap, LogOut, User as UserIcon } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Users, Briefcase, AlertTriangle, TrendingUp, Lock, Shield, Zap, LogOut, User as UserIcon, Loader2 } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import type { Mission, User } from "@shared/schema";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-
-const ADMIN_USERNAME = "MeAuWe";
-const ADMIN_PASSWORD = "Team_HavJob03";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function Admin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   
   const { data: missions = [] } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
   });
 
+  // Check admin authentication status
+  const { data: adminStatus, isLoading: isCheckingAuth } = useQuery<{ isAdmin: boolean; username?: string }>({
+    queryKey: ["/api/auth/admin-status"],
+    retry: false,
+  });
+
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ["/api/users"],
-    enabled: isAdminAuthenticated,
+    enabled: adminStatus?.isAdmin === true,
   });
 
   useEffect(() => {
-    const adminAuth = localStorage.getItem("admin_authenticated");
-    if (adminAuth === "true") {
-      setIsAdminAuthenticated(true);
-    } else {
-      setShowAuthDialog(true);
+    if (!isCheckingAuth) {
+      if (adminStatus?.isAdmin) {
+        setShowAuthDialog(false);
+      } else {
+        setShowAuthDialog(true);
+      }
     }
-  }, []);
+  }, [adminStatus, isCheckingAuth]);
 
-  const handleAdminLogin = () => {
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      setIsAdminAuthenticated(true);
-      localStorage.setItem("admin_authenticated", "true");
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: { username: string; password: string }) => {
+      return await apiRequest("POST", "/api/auth/admin-login", credentials);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/admin-status"] });
       setShowAuthDialog(false);
+      setUsername("");
+      setPassword("");
       toast({
         title: "Connexion réussie",
         description: "Bienvenue dans l'espace administrateur",
       });
-    } else {
+    },
+    onError: (error: any) => {
       toast({
         title: "Erreur d'authentification",
-        description: "Identifiant ou mot de passe incorrect",
+        description: error.message || "Identifiant ou mot de passe incorrect",
         variant: "destructive",
       });
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/auth/admin-logout", {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/admin-status"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setShowAuthDialog(true);
+      setUsername("");
+      setPassword("");
+      toast({
+        title: "Déconnexion",
+        description: "Vous avez été déconnecté de l'espace administrateur",
+      });
+    },
+  });
+
+  const handleAdminLogin = () => {
+    if (!username || !password) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs",
+        variant: "destructive",
+      });
+      return;
     }
+    loginMutation.mutate({ username, password });
   };
 
   const handleLogout = () => {
-    setIsAdminAuthenticated(false);
-    localStorage.removeItem("admin_authenticated");
-    setShowAuthDialog(true);
-    setUsername("");
-    setPassword("");
-    toast({
-      title: "Déconnexion",
-      description: "Vous avez été déconnecté de l'espace administrateur",
-    });
+    logoutMutation.mutate();
   };
 
   const stats = [
@@ -107,7 +138,23 @@ export default function Admin() {
     },
   ];
 
-  if (!isAdminAuthenticated) {
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+        <Card className="w-full max-w-md mx-4">
+          <CardContent className="p-8 text-center">
+            <Loader2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground animate-spin" />
+            <h2 className="text-2xl font-bold mb-2">Vérification...</h2>
+            <p className="text-muted-foreground">
+              Vérification des permissions administrateur
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!adminStatus?.isAdmin) {
     return (
       <>
         <Dialog open={showAuthDialog} onOpenChange={() => {}}>
@@ -129,7 +176,8 @@ export default function Admin() {
                   placeholder="Entrez votre identifiant"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleAdminLogin()}
+                  onKeyDown={(e) => e.key === "Enter" && !loginMutation.isPending && handleAdminLogin()}
+                  disabled={loginMutation.isPending}
                   data-testid="input-admin-username"
                 />
               </div>
@@ -141,15 +189,30 @@ export default function Admin() {
                   placeholder="Entrez votre mot de passe"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleAdminLogin()}
+                  onKeyDown={(e) => e.key === "Enter" && !loginMutation.isPending && handleAdminLogin()}
+                  disabled={loginMutation.isPending}
                   data-testid="input-admin-password"
                 />
               </div>
             </div>
             <DialogFooter className="mt-6">
-              <Button onClick={handleAdminLogin} className="w-full" data-testid="button-admin-login">
-                <Lock className="mr-2 h-4 w-4" />
-                Se connecter
+              <Button 
+                onClick={handleAdminLogin} 
+                className="w-full" 
+                disabled={loginMutation.isPending}
+                data-testid="button-admin-login"
+              >
+                {loginMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Se connecter
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

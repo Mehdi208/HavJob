@@ -322,6 +322,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Authentication
+  const ADMIN_USERNAME = "MeAuWe";
+  const ADMIN_PASSWORD_HASH = await bcrypt.hash("Team_HavJob03", 10);
+
+  // Middleware to check admin authentication
+  const isAdmin = (req: any, res: Response, next: Function) => {
+    if (req.session && req.session.isAdmin === true) {
+      return next();
+    }
+    res.status(403).json({ message: "Accès admin requis" });
+  };
+
+  // Admin login
+  app.post('/api/auth/admin-login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      if (!username || !password) {
+        return res.status(400).json({ message: "Identifiant et mot de passe requis" });
+      }
+
+      // Verify credentials
+      if (username !== ADMIN_USERNAME) {
+        return res.status(401).json({ message: "Identifiant ou mot de passe incorrect" });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Identifiant ou mot de passe incorrect" });
+      }
+
+      // Set admin session
+      req.session.isAdmin = true;
+      req.session.adminUsername = username;
+
+      res.json({ 
+        success: true,
+        message: "Authentification admin réussie"
+      });
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Get admin status
+  app.get('/api/auth/admin-status', (req, res) => {
+    if (req.session && req.session.isAdmin === true) {
+      res.json({ 
+        isAdmin: true,
+        username: req.session.adminUsername 
+      });
+    } else {
+      res.json({ isAdmin: false });
+    }
+  });
+
+  // Admin logout
+  app.post('/api/auth/admin-logout', (req, res) => {
+    if (req.session) {
+      req.session.isAdmin = false;
+      delete req.session.adminUsername;
+    }
+    res.json({ success: true, message: "Déconnexion admin réussie" });
+  });
+
   // Mission routes
   app.get("/api/missions", async (req, res) => {
     try {
@@ -550,7 +616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User/Profile routes
-  app.get("/api/users", async (req, res) => {
+  app.get("/api/users", isAdmin, async (req, res) => {
     try {
       const allUsers = await storage.getAllUsers();
       // Remove passwords from all users
