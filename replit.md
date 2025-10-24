@@ -78,6 +78,14 @@ Preferred communication style: Simple, everyday language.
   - Session expiration: 7 days for phone auth, auto-refresh for OAuth tokens
 - Role-based access control for freelancers, clients, or both
 - authMethod field in users table distinguishes 'replit' vs 'phone' authentication
+- **Admin Authentication:**
+  - Separate session-based authentication for admin access
+  - Credentials stored server-side (not exposed to frontend)
+  - Session regeneration on login prevents session fixation attacks
+  - Session destruction and cookie clearing on logout prevents session reuse
+  - Middleware `isAdmin` protects sensitive admin endpoints (e.g., GET /api/users)
+  - Admin routes: POST /api/auth/admin-login, GET /api/auth/admin-status, POST /api/auth/admin-logout
+  - Admin dashboard accessible via settings icon in footer (/admin route)
 
 ### Database Architecture
 
