@@ -353,13 +353,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Identifiant ou mot de passe incorrect" });
       }
 
-      // Set admin session
-      req.session.isAdmin = true;
-      req.session.adminUsername = username;
+      // Regenerate session to prevent session fixation attacks
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ message: "Erreur lors de la création de la session" });
+        }
 
-      res.json({ 
-        success: true,
-        message: "Authentification admin réussie"
+        // Set admin session flags
+        req.session.isAdmin = true;
+        req.session.adminUsername = username;
+
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ message: "Erreur lors de la sauvegarde de la session" });
+          }
+
+          res.json({ 
+            success: true,
+            message: "Authentification admin réussie"
+          });
+        });
       });
     } catch (error) {
       console.error("Admin login error:", error);
@@ -382,10 +397,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin logout
   app.post('/api/auth/admin-logout', (req, res) => {
     if (req.session) {
-      req.session.isAdmin = false;
-      delete req.session.adminUsername;
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destruction error:", err);
+          return res.status(500).json({ message: "Erreur lors de la déconnexion" });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ success: true, message: "Déconnexion admin réussie" });
+      });
+    } else {
+      res.json({ success: true, message: "Déconnexion admin réussie" });
     }
-    res.json({ success: true, message: "Déconnexion admin réussie" });
   });
 
   // Mission routes
