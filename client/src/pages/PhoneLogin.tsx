@@ -154,16 +154,6 @@ export default function PhoneLogin() {
                   S'inscrire
                 </a>
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Ou{" "}
-                <a
-                  href="/api/login"
-                  className="text-sidebar-accent hover:underline font-medium"
-                  data-testid="link-oauth"
-                >
-                  se connecter avec Google, GitHub, X
-                </a>
-              </p>
             </div>
           </CardContent>
         </Card>
