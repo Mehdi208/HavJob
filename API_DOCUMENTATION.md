@@ -5,8 +5,41 @@ Documentation complète de l'API REST pour l'application mobile HavJob.
 ## Base URL
 
 ```
-Production: https://your-domain.replit.app/api
+Production: https://havjob.replit.app/api
 Development: http://localhost:5000/api
+```
+
+## Configuration CORS
+
+L'API HavJob est configurée pour accepter les requêtes cross-origin depuis :
+
+**Origines autorisées :**
+- ✅ Production HavJob : `https://havjob.replit.app`
+- ✅ Tous les domaines Rork : `*.rork.com` (ex: `app.rork.com`, `dev.rork.com`)
+- ✅ Tous les domaines localhost : `localhost:*`, `127.0.0.1:*` (n'importe quel port)
+- ✅ Requêtes sans origin (applications mobiles natives, Postman, curl)
+- ✅ En développement : Tous les domaines
+
+**Headers supportés :**
+- `Content-Type` : Pour les requêtes JSON
+- `Authorization` : Pour les tokens JWT Bearer
+
+**Méthodes HTTP supportées :**
+- `GET` : Récupération de données
+- `POST` : Création de ressources
+- `PUT` : Mise à jour de ressources
+- `DELETE` : Suppression de ressources
+- `OPTIONS` : Requêtes preflight CORS
+
+**Credentials :**
+- `Access-Control-Allow-Credentials: true` : Les cookies et headers d'authentification sont autorisés
+
+**Exemple de requête avec headers CORS :**
+```bash
+curl -X GET https://havjob.replit.app/api/mobile/user \
+  -H "Origin: https://app.rork.com" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
 ```
 
 ## Authentification

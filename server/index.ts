@@ -11,14 +11,45 @@ const app = express();
 // This allows express-rate-limit to identify individual client IPs from X-Forwarded-For
 app.set('trust proxy', 1);
 
-// CORS configuration for mobile apps
+// CORS configuration for mobile apps and Rork development
 app.use(cors({
-  origin: process.env.NODE_ENV === "production" 
-    ? [
-        process.env.WEB_URL || "https://havjob.replit.app",
-        // Add mobile app origins if needed
-      ]
-    : true, // Allow all origins in development
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, curl)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Always allow production HavJob domain (exact match)
+    if (origin === "https://havjob.replit.app") {
+      return callback(null, true);
+    }
+
+    // Parse the origin URL to validate hostname
+    try {
+      const url = new URL(origin);
+      const hostname = url.hostname;
+
+      // Allow all Rork.com domains and subdomains (strict validation)
+      if (hostname === "rork.com" || hostname.endsWith(".rork.com")) {
+        return callback(null, true);
+      }
+
+      // Allow localhost and 127.0.0.1 with any port (strict hostname check)
+      if (hostname === "localhost" || hostname === "127.0.0.1") {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // Invalid origin URL, fall through to rejection
+    }
+
+    // In development, allow all origins as fallback
+    if (process.env.NODE_ENV === "development") {
+      return callback(null, true);
+    }
+
+    // In production, reject unknown origins
+    callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
