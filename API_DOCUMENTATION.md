@@ -15,6 +15,7 @@ L'API HavJob est configurée pour accepter les requêtes cross-origin depuis :
 
 **Origines autorisées :**
 - ✅ Production HavJob : `https://havjob.replit.app`
+- ✅ Tous les domaines Expo : `*.exp.direct` (ex: `https://isxjwhk-anonymous-8081.exp.direct`)
 - ✅ Tous les domaines Rork : `*.rork.com` (ex: `app.rork.com`, `dev.rork.com`)
 - ✅ Tous les domaines localhost : `localhost:*`, `127.0.0.1:*` (n'importe quel port)
 - ✅ Requêtes sans origin (applications mobiles natives, Postman, curl)

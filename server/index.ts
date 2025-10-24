@@ -11,7 +11,7 @@ const app = express();
 // This allows express-rate-limit to identify individual client IPs from X-Forwarded-For
 app.set('trust proxy', 1);
 
-// CORS configuration for mobile apps and Rork development
+// CORS configuration for mobile apps, Expo, and Rork development
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, Postman, curl)
@@ -28,6 +28,11 @@ app.use(cors({
     try {
       const url = new URL(origin);
       const hostname = url.hostname;
+
+      // Allow all Expo domains (*.exp.direct) for mobile development
+      if (hostname.endsWith(".exp.direct")) {
+        return callback(null, true);
+      }
 
       // Allow all Rork.com domains and subdomains (strict validation)
       if (hostname === "rork.com" || hostname.endsWith(".rork.com")) {
