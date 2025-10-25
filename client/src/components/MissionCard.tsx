@@ -119,9 +119,13 @@ export default function MissionCard({
           <Badge variant="secondary" className="text-sm" data-testid={`badge-category-${id}`}>
             {category}
           </Badge>
-          {isRemote && (
+          {isRemote ? (
             <Badge variant="outline" className="text-sm">
               À distance
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-sm">
+              Sur site
             </Badge>
           )}
         </div>

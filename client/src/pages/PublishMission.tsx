@@ -262,22 +262,34 @@ export default function PublishMission() {
                 control={form.control}
                 name="isRemote"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Télétravail
-                      </FormLabel>
-                      <FormDescription>
-                        Mission réalisable à distance
-                      </FormDescription>
+                  <FormItem>
+                    <FormLabel className="text-base">Type de mission</FormLabel>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div
+                        className={`cursor-pointer rounded-lg border p-4 hover-elevate transition-all ${
+                          !field.value ? "border-primary bg-primary/5" : "border-border"
+                        }`}
+                        onClick={() => field.onChange(false)}
+                        data-testid="option-onsite"
+                      >
+                        <div className="font-medium mb-1">Travail sur site</div>
+                        <div className="text-sm text-muted-foreground">
+                          Mission à réaliser sur place
+                        </div>
+                      </div>
+                      <div
+                        className={`cursor-pointer rounded-lg border p-4 hover-elevate transition-all ${
+                          field.value ? "border-primary bg-primary/5" : "border-border"
+                        }`}
+                        onClick={() => field.onChange(true)}
+                        data-testid="option-remote"
+                      >
+                        <div className="font-medium mb-1">Télétravail</div>
+                        <div className="text-sm text-muted-foreground">
+                          Mission réalisable à distance
+                        </div>
+                      </div>
                     </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value || false}
-                        onCheckedChange={field.onChange}
-                        data-testid="switch-remote"
-                      />
-                    </FormControl>
                   </FormItem>
                 )}
               />
