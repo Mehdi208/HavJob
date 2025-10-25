@@ -10,10 +10,26 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Star, Heart, Settings, Plus, Zap, Edit } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Briefcase, Star, Heart, Settings, Plus, Zap, Edit, UserCircle, X } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import type { User, Mission } from "@shared/schema";
+
+const profileSchema = z.object({
+  fullName: z.string().min(2, "Le nom complet est requis"),
+  bio: z.string().min(20, "La description doit contenir au moins 20 caractères").optional().or(z.literal("")),
+  location: z.string().optional().or(z.literal("")),
+  skills: z.string().optional(),
+  cvUrl: z.string().url("URL invalide").optional().or(z.literal("")),
+});
+
+type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -21,10 +37,35 @@ export default function Dashboard() {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [newStatus, setNewStatus] = useState("");
+  const [skillInput, setSkillInput] = useState("");
+  const [skillsList, setSkillsList] = useState<string[]>([]);
 
   const { data: currentUser, isLoading } = useQuery<User>({
     queryKey: ["/api/auth/user"],
   });
+
+  const form = useForm<ProfileForm>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      fullName: currentUser?.fullName || "",
+      bio: currentUser?.bio || "",
+      location: currentUser?.location || "",
+      skills: "",
+      cvUrl: currentUser?.cvUrl || "",
+    },
+  });
+
+  // Update form when currentUser data loads
+  if (currentUser && !form.formState.isDirty) {
+    form.reset({
+      fullName: currentUser.fullName || "",
+      bio: currentUser.bio || "",
+      location: currentUser.location || "",
+      skills: "",
+      cvUrl: currentUser.cvUrl || "",
+    });
+    setSkillsList(currentUser.skills || []);
+  }
 
   const { data: myMissions = [] } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
@@ -64,6 +105,27 @@ export default function Dashboard() {
         variant: "destructive",
         title: "Erreur",
         description: error.message || "Impossible de mettre à jour le statut",
+      });
+    },
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: Partial<User>) => {
+      return await apiRequest("PATCH", "/api/users/me", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/freelances"] });
+      toast({
+        title: "Profil mis à jour",
+        description: "Votre profil a été mis à jour avec succès",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Impossible de mettre à jour le profil",
       });
     },
   });
@@ -124,6 +186,27 @@ export default function Dashboard() {
     if (status === "open" || status === "toujours_actualite") return "default";
     if (status === "quelqu_un_retenu" || status === "completed") return "secondary";
     return "outline";
+  };
+
+  const handleAddSkill = () => {
+    if (skillInput.trim() && !skillsList.includes(skillInput.trim())) {
+      setSkillsList([...skillsList, skillInput.trim()]);
+      setSkillInput("");
+    }
+  };
+
+  const handleRemoveSkill = (skill: string) => {
+    setSkillsList(skillsList.filter(s => s !== skill));
+  };
+
+  const onSubmitProfile = (data: ProfileForm) => {
+    updateProfileMutation.mutate({
+      fullName: data.fullName,
+      bio: data.bio || null,
+      location: data.location || null,
+      skills: skillsList.length > 0 ? skillsList : null,
+      cvUrl: data.cvUrl || null,
+    });
   };
 
   return (
@@ -200,7 +283,7 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="missions" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="missions" data-testid="tab-missions">
               <Briefcase className="h-4 w-4 mr-2" />
               Mes missions
@@ -212,6 +295,10 @@ export default function Dashboard() {
             <TabsTrigger value="favorites" data-testid="tab-favorites">
               <Heart className="h-4 w-4 mr-2" />
               Favoris
+            </TabsTrigger>
+            <TabsTrigger value="profile" data-testid="tab-profile">
+              <UserCircle className="h-4 w-4 mr-2" />
+              Mon profil
             </TabsTrigger>
           </TabsList>
 
@@ -352,6 +439,133 @@ export default function Dashboard() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-4">
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-6">
+                Mon profil Freelance
+              </h2>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmitProfile)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nom complet *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Votre nom complet" data-testid="input-fullname" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description professionnelle</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Décrivez votre parcours, vos compétences et votre expérience..."
+                            className="min-h-[120px]"
+                            value={field.value || ""}
+                            data-testid="textarea-bio"
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Minimum 20 caractères pour apparaître dans l'annuaire des freelances
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Localisation</FormLabel>
+                        <FormControl>
+                          <Input {...field} value={field.value || ""} placeholder="Abidjan, Yamoussoukro..." data-testid="input-location" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-2">
+                    <FormLabel>Compétences</FormLabel>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Ajouter une compétence..."
+                        value={skillInput}
+                        onChange={(e) => setSkillInput(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddSkill();
+                          }
+                        }}
+                        data-testid="input-skill"
+                      />
+                      <Button type="button" onClick={handleAddSkill} data-testid="button-add-skill">
+                        Ajouter
+                      </Button>
+                    </div>
+                    {skillsList.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {skillsList.map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="gap-1">
+                            {skill}
+                            <X
+                              className="h-3 w-3 cursor-pointer hover:text-destructive"
+                              onClick={() => handleRemoveSkill(skill)}
+                              data-testid={`button-remove-skill-${index}`}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-sm text-muted-foreground">
+                      Ajoutez au moins une compétence pour apparaître dans l'annuaire
+                    </p>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="cvUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Lien vers votre CV</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ""}
+                            type="url"
+                            placeholder="https://..."
+                            data-testid="input-cv-url"
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Lien vers votre CV en ligne (Google Drive, Dropbox, etc.)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" disabled={updateProfileMutation.isPending} data-testid="button-save-profile">
+                    {updateProfileMutation.isPending ? "Enregistrement..." : "Enregistrer mon profil"}
+                  </Button>
+                </form>
+              </Form>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
