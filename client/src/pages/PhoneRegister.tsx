@@ -57,7 +57,7 @@ export default function PhoneRegister() {
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      phoneNumber: "",
+      phoneNumber: "+225",
       password: "",
       confirmPassword: "",
       fullName: "",

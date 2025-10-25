@@ -40,7 +40,7 @@ export default function PhoneLogin() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      phoneNumber: "",
+      phoneNumber: "+225",
       password: "",
     },
   });
