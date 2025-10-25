@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users, Briefcase, AlertTriangle, TrendingUp, Lock, Shield, Zap, LogOut, User as UserIcon, Loader2 } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -21,6 +22,13 @@ export default function Admin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  
+  // Boost modal states
+  const [isBoostDialogOpen, setIsBoostDialogOpen] = useState(false);
+  const [boostTargetType, setBoostTargetType] = useState<"user" | "mission">("user");
+  const [boostTargetId, setBoostTargetId] = useState("");
+  const [boostTargetName, setBoostTargetName] = useState("");
+  const [selectedDuration, setSelectedDuration] = useState<number>(7);
   
   const { data: missions = [] } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
@@ -103,10 +111,74 @@ export default function Admin() {
     logoutMutation.mutate();
   };
 
+  // Boost mutation
+  const boostMutation = useMutation({
+    mutationFn: async ({ targetType, targetId, duration }: { targetType: "user" | "mission"; targetId: string; duration: number }) => {
+      const endpoint = targetType === "user" 
+        ? `/api/admin/boost-user/${targetId}` 
+        : `/api/admin/boost-mission/${targetId}`;
+      return await apiRequest("POST", endpoint, { duration });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setIsBoostDialogOpen(false);
+      toast({
+        title: "Boost activé",
+        description: `${boostTargetType === "user" ? "Le freelance" : "La mission"} a été boosté avec succès pour ${selectedDuration} jour(s)`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de booster",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleOpenBoostDialog = (type: "user" | "mission", id: string, name: string) => {
+    setBoostTargetType(type);
+    setBoostTargetId(id);
+    setBoostTargetName(name);
+    setSelectedDuration(7); // Default to 7 days
+    setIsBoostDialogOpen(true);
+  };
+
+  const handleBoost = () => {
+    if (!boostTargetId || !selectedDuration) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner une durée",
+        variant: "destructive",
+      });
+      return;
+    }
+    boostMutation.mutate({
+      targetType: boostTargetType,
+      targetId: boostTargetId,
+      duration: selectedDuration,
+    });
+  };
+
+  // Filter out test users and N/A data
+  const isTestUser = (user: User) => {
+    const nameToCheck = user.fullName?.toLowerCase() || "";
+    const phoneToCheck = user.phoneNumber?.toLowerCase() || "";
+    return (
+      nameToCheck.includes("test") ||
+      nameToCheck.includes("n/a") ||
+      phoneToCheck.includes("n/a")
+    );
+  };
+
+  const realUsers = users.filter(u => !isTestUser(u));
+  const realFreelances = realUsers.filter(u => u.role === "freelance" || u.role === "both");
+
   const stats = [
     {
       title: "Utilisateurs totaux",
-      value: users.length.toString(),
+      value: realUsers.length.toString(),
       icon: Users,
       description: "Inscrits sur la plateforme",
       color: "text-blue-600",
@@ -122,7 +194,7 @@ export default function Admin() {
     },
     {
       title: "Freelances",
-      value: users.filter(u => u.role === "freelance" || u.role === "both").length.toString(),
+      value: realFreelances.length.toString(),
       icon: UserIcon,
       description: "Profils freelances actifs",
       color: "text-purple-600",
@@ -232,7 +304,7 @@ export default function Admin() {
     );
   }
 
-  const freelances = users.filter(u => u.role === "freelance" || u.role === "both");
+  const freelances = realFreelances;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-muted/30 via-background to-muted/20">
@@ -319,9 +391,16 @@ export default function Admin() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
+                          {freelance.isBoosted && (
+                            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+                              <Zap className="mr-1 h-3 w-3" />
+                              Boosté
+                            </Badge>
+                          )}
                           <Button 
                             variant="default" 
                             size="sm"
+                            onClick={() => handleOpenBoostDialog("user", freelance.id, freelance.fullName || "Freelance")}
                             data-testid={`button-boost-freelance-${freelance.id}`}
                           >
                             <Zap className="mr-2 h-4 w-4" />
@@ -375,6 +454,15 @@ export default function Admin() {
                               Boosté
                             </Badge>
                           )}
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => handleOpenBoostDialog("mission", mission.id, mission.title)}
+                            data-testid={`button-boost-mission-${mission.id}`}
+                          >
+                            <Zap className="mr-2 h-4 w-4" />
+                            Booster
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -384,6 +472,75 @@ export default function Admin() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Boost Dialog */}
+        <Dialog open={isBoostDialogOpen} onOpenChange={setIsBoostDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center">
+                <Zap className="h-8 w-8 text-white" />
+              </div>
+              <DialogTitle className="text-center text-2xl">
+                Booster {boostTargetType === "user" ? "le freelance" : "la mission"}
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                {boostTargetName}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="boost-duration">Durée du boost</Label>
+                <Select
+                  value={selectedDuration.toString()}
+                  onValueChange={(value) => setSelectedDuration(parseInt(value))}
+                >
+                  <SelectTrigger id="boost-duration" data-testid="select-boost-duration">
+                    <SelectValue placeholder="Sélectionner une durée" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 jour</SelectItem>
+                    <SelectItem value="3">3 jours</SelectItem>
+                    <SelectItem value="7">7 jours</SelectItem>
+                    <SelectItem value="15">15 jours</SelectItem>
+                    <SelectItem value="30">30 jours</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-sm text-muted-foreground text-center">
+                  Le boost augmentera la visibilité dans les résultats de recherche et apparaîtra en haut des listes pendant la durée sélectionnée.
+                </p>
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setIsBoostDialogOpen(false)}
+                disabled={boostMutation.isPending}
+                data-testid="button-cancel-boost"
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={handleBoost}
+                disabled={boostMutation.isPending}
+                data-testid="button-confirm-boost"
+              >
+                {boostMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Activation...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="mr-2 h-4 w-4" />
+                    Activer le boost
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

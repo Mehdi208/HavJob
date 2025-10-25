@@ -727,6 +727,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Boost routes
+  app.post("/api/admin/boost-user/:id", isAdmin, async (req, res) => {
+    try {
+      const { duration } = req.body;
+      const userId = req.params.id;
+
+      // Validate duration
+      const validDurations = [1, 3, 7, 15, 30];
+      if (!duration || !validDurations.includes(duration)) {
+        return res.status(400).json({ 
+          error: "Durée invalide. Valeurs acceptées: 1, 3, 7, 15, 30 jours" 
+        });
+      }
+
+      // Calculate expiration date
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + duration);
+
+      // Update user
+      const updatedUser = await storage.updateUser(userId, {
+        isBoosted: true,
+        boostExpiresAt: expiresAt,
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      }
+
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error boosting user:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.post("/api/admin/boost-mission/:id", isAdmin, async (req, res) => {
+    try {
+      const { duration } = req.body;
+      const missionId = req.params.id;
+
+      // Validate duration
+      const validDurations = [1, 3, 7, 15, 30];
+      if (!duration || !validDurations.includes(duration)) {
+        return res.status(400).json({ 
+          error: "Durée invalide. Valeurs acceptées: 1, 3, 7, 15, 30 jours" 
+        });
+      }
+
+      // Calculate expiration date
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + duration);
+
+      // Update mission
+      const updatedMission = await storage.updateMission(missionId, {
+        isBoosted: true,
+        boostExpiresAt: expiresAt,
+      });
+
+      if (!updatedMission) {
+        return res.status(404).json({ error: "Mission non trouvée" });
+      }
+
+      res.json(updatedMission);
+    } catch (error) {
+      console.error("Error boosting mission:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
