@@ -5,15 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 
 export default function Contact() {
-  const handleCall = (phoneNumber: string) => {
-    window.location.href = `tel:${phoneNumber}`;
-  };
-
-  const handleWhatsApp = (phoneNumber: string) => {
-    const message = encodeURIComponent("Bonjour, je vous contacte depuis HavJob.");
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -34,29 +25,38 @@ export default function Contact() {
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Phone className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Téléphone</h3>
-              <p className="text-sm text-muted-foreground mb-4" data-testid="text-phone">
-                +225 07 XX XX XX XX
-              </p>
-              <div className="flex flex-col gap-2">
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  onClick={() => handleCall("+22507XXXXXXXX")}
-                  data-testid="button-call"
+              <h3 className="font-semibold mb-4">Téléphone WhatsApp</h3>
+              <div className="flex flex-col gap-3">
+                <a
+                  href="https://wa.me/2250769275305?text=Bonjour,%20je%20vous%20contacte%20depuis%20HavJob."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline cursor-pointer flex items-center justify-center gap-2 hover-elevate p-2 rounded"
+                  data-testid="link-whatsapp-1"
                 >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Appeler
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-[#25D366] hover:bg-[#20BD5A] text-white"
-                  onClick={() => handleWhatsApp("22507XXXXXXXX")}
-                  data-testid="button-whatsapp"
+                  <MessageCircle className="h-4 w-4" />
+                  +225 07 69 27 53 05
+                </a>
+                <a
+                  href="https://wa.me/2250566868795?text=Bonjour,%20je%20vous%20contacte%20depuis%20HavJob."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline cursor-pointer flex items-center justify-center gap-2 hover-elevate p-2 rounded"
+                  data-testid="link-whatsapp-2"
                 >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  WhatsApp
-                </Button>
+                  <MessageCircle className="h-4 w-4" />
+                  +225 05 66 86 87 95
+                </a>
+                <a
+                  href="https://wa.me/2250789609672?text=Bonjour,%20je%20vous%20contacte%20depuis%20HavJob."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline cursor-pointer flex items-center justify-center gap-2 hover-elevate p-2 rounded"
+                  data-testid="link-whatsapp-3"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  +225 07 89 60 96 72
+                </a>
               </div>
             </CardContent>
           </Card>

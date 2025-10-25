@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import Navbar from "@/components/Navbar";
@@ -47,25 +47,26 @@ export default function Dashboard() {
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: currentUser?.fullName || "",
-      bio: currentUser?.bio || "",
-      location: currentUser?.location || "",
+      fullName: "",
+      bio: "",
+      location: "",
       skills: "",
-      cvUrl: currentUser?.cvUrl || "",
+      cvUrl: "",
     },
   });
 
-  // Update form when currentUser data loads
-  if (currentUser && !form.formState.isDirty) {
-    form.reset({
-      fullName: currentUser.fullName || "",
-      bio: currentUser.bio || "",
-      location: currentUser.location || "",
-      skills: "",
-      cvUrl: currentUser.cvUrl || "",
-    });
-    setSkillsList(currentUser.skills || []);
-  }
+  useEffect(() => {
+    if (currentUser) {
+      form.reset({
+        fullName: currentUser.fullName || "",
+        bio: currentUser.bio || "",
+        location: currentUser.location || "",
+        skills: "",
+        cvUrl: currentUser.cvUrl || "",
+      });
+      setSkillsList(currentUser.skills || []);
+    }
+  }, [currentUser?.id]);
 
   const { data: myMissions = [] } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
