@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Briefcase, AlertTriangle, TrendingUp, Lock, Shield, Zap, LogOut, User as UserIcon, Loader2 } from "lucide-react";
+import { Users, Briefcase, AlertTriangle, TrendingUp, Lock, Shield, Zap, LogOut, User as UserIcon, Loader2, Trash2, Edit } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import type { Mission, User } from "@shared/schema";
@@ -29,6 +29,13 @@ export default function Admin() {
   const [boostTargetId, setBoostTargetId] = useState("");
   const [boostTargetName, setBoostTargetName] = useState("");
   const [selectedDuration, setSelectedDuration] = useState<number>(7);
+  
+  // Edit user modal states
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editUserId, setEditUserId] = useState("");
+  const [editFullName, setEditFullName] = useState("");
+  const [editPhoneNumber, setEditPhoneNumber] = useState("");
+  const [editEmail, setEditEmail] = useState("");
   
   const { data: missions = [] } = useQuery<Mission[]>({
     queryKey: ["/api/missions"],
@@ -158,6 +165,82 @@ export default function Admin() {
       targetType: boostTargetType,
       targetId: boostTargetId,
       duration: selectedDuration,
+    });
+  };
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest("DELETE", `/api/admin/users/${userId}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Utilisateur supprimé",
+        description: "Le compte a été supprimé avec succès",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer l'utilisateur",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit user mutation
+  const editUserMutation = useMutation({
+    mutationFn: async ({ userId, updates }: { userId: string; updates: any }) => {
+      return await apiRequest("PATCH", `/api/admin/users/${userId}`, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      setIsEditDialogOpen(false);
+      toast({
+        title: "Utilisateur modifié",
+        description: "Les informations ont été mises à jour avec succès",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de modifier l'utilisateur",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteUser = (userId: string, userName: string) => {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer le compte de ${userName} ? Cette action est irréversible.`)) {
+      deleteUserMutation.mutate(userId);
+    }
+  };
+
+  const handleOpenEditDialog = (user: User) => {
+    setEditUserId(user.id);
+    setEditFullName(user.fullName || "");
+    setEditPhoneNumber(user.phoneNumber || "");
+    setEditEmail(user.email || "");
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditUser = () => {
+    if (!editFullName.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Le nom complet est requis",
+        variant: "destructive",
+      });
+      return;
+    }
+    editUserMutation.mutate({
+      userId: editUserId,
+      updates: {
+        fullName: editFullName,
+        phoneNumber: editPhoneNumber || null,
+        email: editEmail || null,
+      },
     });
   };
 
@@ -398,6 +481,15 @@ export default function Admin() {
                             </Badge>
                           )}
                           <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleOpenEditDialog(freelance)}
+                            data-testid={`button-edit-freelance-${freelance.id}`}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Modifier
+                          </Button>
+                          <Button 
                             variant="default" 
                             size="sm"
                             onClick={() => handleOpenBoostDialog("user", freelance.id, freelance.fullName || "Freelance")}
@@ -405,6 +497,14 @@ export default function Admin() {
                           >
                             <Zap className="mr-2 h-4 w-4" />
                             Booster
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDeleteUser(freelance.id, freelance.fullName || "Freelance")}
+                            data-testid={`button-delete-freelance-${freelance.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -536,6 +636,78 @@ export default function Admin() {
                     <Zap className="mr-2 h-4 w-4" />
                     Activer le boost
                   </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit User Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-2xl">
+                Modifier les informations
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                Modifier le nom et les coordonnées de l'utilisateur
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-fullname">Nom complet <span className="text-destructive">*</span></Label>
+                <Input
+                  id="edit-fullname"
+                  value={editFullName}
+                  onChange={(e) => setEditFullName(e.target.value)}
+                  placeholder="Jean Kouassi"
+                  data-testid="input-edit-fullname"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-phone">Numéro de téléphone</Label>
+                <Input
+                  id="edit-phone"
+                  type="tel"
+                  value={editPhoneNumber}
+                  onChange={(e) => setEditPhoneNumber(e.target.value)}
+                  placeholder="+225 07 XX XX XX XX"
+                  data-testid="input-edit-phone"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  placeholder="jean@example.com"
+                  data-testid="input-edit-email"
+                />
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+                disabled={editUserMutation.isPending}
+                data-testid="button-cancel-edit"
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={handleEditUser}
+                disabled={editUserMutation.isPending}
+                data-testid="button-confirm-edit"
+              >
+                {editUserMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  "Enregistrer"
                 )}
               </Button>
             </DialogFooter>

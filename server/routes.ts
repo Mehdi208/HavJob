@@ -322,6 +322,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update own profile (authenticated user)
+  app.patch('/api/auth/user/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const updates = req.body;
+      
+      // Only allow updating specific safe fields
+      const allowedFields = ['fullName', 'phoneNumber', 'email', 'bio', 'skills', 'location', 'avatar', 'cvUrl'];
+      const filteredUpdates: any = {};
+      
+      for (const field of allowedFields) {
+        if (updates[field] !== undefined) {
+          filteredUpdates[field] = updates[field];
+        }
+      }
+      
+      // Validate that fullName is not empty if provided
+      if (filteredUpdates.fullName !== undefined && !filteredUpdates.fullName.trim()) {
+        return res.status(400).json({ message: "Le nom complet ne peut pas être vide" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, filteredUpdates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+      
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Erreur lors de la mise à jour du profil" });
+    }
+  });
+
   // Admin Authentication
   const ADMIN_USERNAME = "MeAuWe";
   const ADMIN_PASSWORD_HASH = await bcrypt.hash("Team_HavJob03", 10);
@@ -793,6 +828,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedMission);
     } catch (error) {
       console.error("Error boosting mission:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Admin User Management routes
+  app.delete("/api/admin/users/:id", isAdmin, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      
+      const success = await storage.deleteUser(userId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      }
+      
+      res.json({ message: "Utilisateur supprimé avec succès" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", isAdmin, async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const updates = req.body;
+      
+      // Validate that we're not allowing dangerous updates
+      const allowedFields = ['fullName', 'phoneNumber', 'email', 'role', 'bio', 'skills', 'location', 'avatar', 'cvUrl'];
+      const filteredUpdates: any = {};
+      
+      for (const field of allowedFields) {
+        if (updates[field] !== undefined) {
+          filteredUpdates[field] = updates[field];
+        }
+      }
+      
+      const updatedUser = await storage.updateUser(userId, filteredUpdates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      }
+      
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error updating user:", error);
       res.status(500).json({ error: "Erreur serveur" });
     }
   });

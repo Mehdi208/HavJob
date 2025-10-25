@@ -21,6 +21,7 @@ import FreelanceProfile from "@/pages/FreelanceProfile";
 import Admin from "@/pages/Admin";
 import PhoneRegister from "@/pages/PhoneRegister";
 import PhoneLogin from "@/pages/PhoneLogin";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 
 function HomePage() {
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/cgu" component={CGU} />
       <Route path="/admin" component={Admin} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -111,6 +111,11 @@ export default function Navbar() {
                         Mon dashboard
                       </DropdownMenuItem>
                     </Link>
+                    <Link href="/settings">
+                      <DropdownMenuItem data-testid="menu-settings">
+                        Paramètres
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem 
                       onClick={handleLogout}
                       data-testid="menu-logout"
@@ -190,6 +195,15 @@ export default function Navbar() {
                     data-testid="button-profile-mobile"
                   >
                     Mon profil
+                  </Button>
+                </Link>
+                <Link href="/settings">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    data-testid="button-settings-mobile"
+                  >
+                    Paramètres
                   </Button>
                 </Link>
                 <Button

@@ -30,6 +30,7 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   createPhoneUser(user: PhoneRegister & { password: string }): Promise<User>;
   updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
   
   // Mission methods
   getMission(id: string): Promise<Mission | undefined>;
@@ -141,6 +142,15 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return result[0];
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await db
+      .delete(users)
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result.length > 0;
   }
 
   async getMission(id: string): Promise<Mission | undefined> {
@@ -697,6 +707,14 @@ export class MemStorage implements IStorage {
     const updatedUser = { ...user, ...updates };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const user = this.users.get(id);
+    if (!user) return false;
+    
+    this.users.delete(id);
+    return true;
   }
 
   // Mission methods
