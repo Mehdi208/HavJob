@@ -75,7 +75,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               className="group"
-              onClick={() => window.location.href = '/api/login'}
+              onClick={() => window.location.href = '/connexion-telephone'}
               data-testid="button-login-cta"
             >
               Se connecter
