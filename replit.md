@@ -8,6 +8,14 @@ The application targets a mobile-first audience in Côte d'Ivoire, emphasizing a
 
 ## Recent Changes
 
+**October 25, 2025:**
+- Corrected Maketou integration URLs and pricing on Boost page
+  - Separated mission boost and profile boost plans into distinct arrays
+  - Updated mission boost URLs: boost-24h-0, boost-24h-0-9, boost-24h-0-9-8-0, boost-24h-0-9-8-0-3, boost-24h-0-9-8-0-3-8-6-5
+  - Updated profile boost URLs: boost-24h, boost-24h-0-9-8, boost-24h-0-9-8-0-4, boost-24h-0-9-8-0-3-8, boost-24h-0-9-8-0-3-8-6
+  - Corrected pricing: 1,000, 1,100, 1,200, 1,500, 2,000 FCFA (reduced from 5,000-80,000 FCFA)
+  - Recalculated savings percentages: 10%, 20%, 50%, 67%
+
 **October 24, 2025:**
 - Fixed mobile registration bug (HTTP 500) caused by missing database columns
 - Synchronized PostgreSQL schema with Drizzle definitions using `npm run db:push`
