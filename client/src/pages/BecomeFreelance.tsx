@@ -104,7 +104,9 @@ export default function BecomeFreelance() {
                 </CardContent>
               </Card>
             ))}
-            <Card className="hover-elevate text-center bg-muted/50">
+          </div>
+          <div className="flex justify-center mt-4">
+            <Card className="hover-elevate text-center bg-muted/50 w-full md:w-1/4">
               <CardContent className="p-6">
                 <p className="font-medium text-muted-foreground">Et bien d'autres domaines...</p>
               </CardContent>
