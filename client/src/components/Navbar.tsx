@@ -75,8 +75,13 @@ export default function Navbar() {
                   Accueil
                 </Button>
               </Link>
+              <Link href="/publier">
+                <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap" data-testid="nav-link-publish">
+                  Publier
+                </Button>
+              </Link>
               <Link href="/missions">
-                <Button variant="ghost" size="sm" className="text-sm" data-testid="nav-link-missions">
+                <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap" data-testid="nav-link-missions">
                   Missions
                 </Button>
               </Link>
@@ -158,6 +163,15 @@ export default function Navbar() {
                     data-testid="nav-link-home-mobile"
                   >
                     Accueil
+                  </Button>
+                </Link>
+                <Link href="/publier">
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    data-testid="nav-link-publish-mobile-auth"
+                  >
+                    Publier une mission
                   </Button>
                 </Link>
                 <Link href="/missions">
