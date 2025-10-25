@@ -181,7 +181,7 @@ export default function FreelanceProfile() {
           )}
         </Card>
 
-        {freelance.reviewCount && freelance.reviewCount > 0 && (
+        {(freelance.reviewCount ?? 0) > 0 && (
           <Card className="p-6 mt-6">
             <CardHeader className="px-0 pt-0">
               <CardTitle className="flex items-center gap-2">
