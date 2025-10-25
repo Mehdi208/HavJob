@@ -11,7 +11,7 @@ export default function Boost() {
     {
       days: 1,
       price: 5000,
-      url: "https://chariow.com/s/havjob/5000",
+      url: "https://maketou.ci/checkout/havjob-boost-1j",
       popular: false,
       features: [
         "Visibilité maximale pendant 24h",
@@ -23,7 +23,7 @@ export default function Boost() {
     {
       days: 3,
       price: 12000,
-      url: "https://chariow.com/s/havjob/12000",
+      url: "https://maketou.ci/checkout/havjob-boost-3j",
       popular: false,
       features: [
         "Visibilité maximale pendant 3 jours",
@@ -35,7 +35,7 @@ export default function Boost() {
     {
       days: 7,
       price: 25000,
-      url: "https://chariow.com/s/havjob/25000",
+      url: "https://maketou.ci/checkout/havjob-boost-7j",
       popular: true,
       features: [
         "Visibilité maximale pendant 7 jours",
@@ -48,7 +48,7 @@ export default function Boost() {
     {
       days: 15,
       price: 45000,
-      url: "https://chariow.com/s/havjob/45000",
+      url: "https://maketou.ci/checkout/havjob-boost-15j",
       popular: false,
       features: [
         "Visibilité maximale pendant 15 jours",
@@ -60,7 +60,7 @@ export default function Boost() {
     {
       days: 30,
       price: 80000,
-      url: "https://chariow.com/s/havjob/80000",
+      url: "https://maketou.ci/checkout/havjob-boost-30j",
       popular: false,
       features: [
         "Visibilité maximale pendant 30 jours",
@@ -278,9 +278,9 @@ export default function Boost() {
                 <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   2
                 </div>
-                <h4 className="font-semibold mb-2">Payez via Chariow</h4>
+                <h4 className="font-semibold mb-2">Payez via Maketou</h4>
                 <p className="text-sm text-muted-foreground">
-                  Effectuez votre paiement sécurisé via notre partenaire Chariow
+                  Effectuez votre paiement sécurisé via notre partenaire Maketou
                 </p>
               </div>
               <div className="text-center">

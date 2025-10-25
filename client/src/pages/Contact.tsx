@@ -2,44 +2,16 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { Phone, Mail, MapPin } from "lucide-react";
-
-const contactSchema = z.object({
-  fullName: z.string().min(2, "Le nom complet est requis"),
-  email: z.string().email("Email invalide"),
-  subject: z.string().min(1, "Veuillez sélectionner un sujet"),
-  message: z.string().min(20, "Le message doit contenir au moins 20 caractères"),
-});
-
-type ContactForm = z.infer<typeof contactSchema>;
+import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 
 export default function Contact() {
-  const { toast } = useToast();
+  const handleCall = (phoneNumber: string) => {
+    window.location.href = `tel:${phoneNumber}`;
+  };
 
-  const form = useForm<ContactForm>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      subject: "",
-      message: "",
-    },
-  });
-
-  const onSubmit = (data: ContactForm) => {
-    toast({
-      title: "Message envoyé !",
-      description: "Nous vous répondrons dans les plus brefs délais.",
-    });
-    form.reset();
+  const handleWhatsApp = (phoneNumber: string) => {
+    const message = encodeURIComponent("Bonjour, je vous contacte depuis HavJob.");
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
   return (
@@ -52,7 +24,7 @@ export default function Contact() {
             Contactez-nous
           </h1>
           <p className="text-xl text-muted-foreground">
-            Une question ? Une suggestion ? N'hésitez pas à nous écrire
+            Notre équipe est à votre disposition pour répondre à vos questions
           </p>
         </div>
 
@@ -63,7 +35,29 @@ export default function Contact() {
                 <Phone className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Téléphone</h3>
-              <p className="text-sm text-muted-foreground">+225 XX XX XX XX XX</p>
+              <p className="text-sm text-muted-foreground mb-4" data-testid="text-phone">
+                +225 07 XX XX XX XX
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleCall("+22507XXXXXXXX")}
+                  data-testid="button-call"
+                >
+                  <Phone className="h-4 w-4 mr-2" />
+                  Appeler
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-[#25D366] hover:bg-[#20BD5A] text-white"
+                  onClick={() => handleWhatsApp("22507XXXXXXXX")}
+                  data-testid="button-whatsapp"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  WhatsApp
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -73,7 +67,18 @@ export default function Contact() {
                 <Mail className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Email</h3>
-              <p className="text-sm text-muted-foreground">contact@havjob.ci</p>
+              <p className="text-sm text-muted-foreground mb-4" data-testid="text-email">
+                contact@havjob.ci
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => window.location.href = "mailto:contact@havjob.ci"}
+                data-testid="button-email"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Envoyer un email
+              </Button>
             </CardContent>
           </Card>
 
@@ -82,97 +87,32 @@ export default function Contact() {
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <MapPin className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Adresse</h3>
-              <p className="text-sm text-muted-foreground">Abidjan, Côte d'Ivoire</p>
+              <h3 className="font-semibold mb-2">Localisation</h3>
+              <p className="text-sm text-muted-foreground" data-testid="text-location">
+                Abidjan, Côte d'Ivoire
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-semibold mb-6">Envoyez-nous un message</h2>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nom complet *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Votre nom complet" {...field} data-testid="input-fullname" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email *</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="votre@email.com" {...field} data-testid="input-email" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="subject"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sujet *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger data-testid="select-subject">
-                            <SelectValue placeholder="Choisissez un sujet" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="question">Question générale</SelectItem>
-                          <SelectItem value="support">Support technique</SelectItem>
-                          <SelectItem value="litige">Signaler un litige</SelectItem>
-                          <SelectItem value="boost">Question sur le boost</SelectItem>
-                          <SelectItem value="partenariat">Partenariat</SelectItem>
-                          <SelectItem value="autre">Autre</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Message *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Décrivez votre demande en détail..."
-                          className="min-h-[150px]"
-                          {...field}
-                          data-testid="textarea-message"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" size="lg" className="w-full md:w-auto" data-testid="button-submit">
-                  Envoyer le message
-                </Button>
-              </form>
-            </Form>
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Heures d'ouverture
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mt-6">
+              <div className="text-center">
+                <p className="font-semibold mb-2">Lundi - Vendredi</p>
+                <p className="text-muted-foreground">8h00 - 18h00</p>
+              </div>
+              <div className="text-center">
+                <p className="font-semibold mb-2">Samedi</p>
+                <p className="text-muted-foreground">9h00 - 14h00</p>
+              </div>
+            </div>
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              Notre équipe vous répondra dans les plus brefs délais
+            </p>
           </CardContent>
         </Card>
       </div>
