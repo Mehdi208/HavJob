@@ -14,11 +14,11 @@ import {
 } from "lucide-react";
 
 export default function Boost() {
-  const plans = [
+  const missionPlans = [
     {
       days: 1,
-      price: 5000,
-      url: "https://maketou.ci/checkout/havjob-boost-1j",
+      price: 1000,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0",
       popular: false,
       features: [
         "Visibilité maximale pendant 24h",
@@ -29,52 +29,117 @@ export default function Boost() {
     },
     {
       days: 3,
-      price: 12000,
-      url: "https://maketou.ci/checkout/havjob-boost-3j",
+      price: 1100,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9",
       popular: false,
       features: [
         "Visibilité maximale pendant 3 jours",
         "Apparaît en tête des résultats",
         "Badge 'Boosté' visible",
-        "Économie de 20% vs 1 jour",
+        "Économie de 10% vs 1 jour",
       ],
     },
     {
       days: 7,
-      price: 25000,
-      url: "https://maketou.ci/checkout/havjob-boost-7j",
+      price: 1200,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0",
       popular: true,
       features: [
         "Visibilité maximale pendant 7 jours",
         "Apparaît en tête des résultats",
         "Badge 'Boosté' visible",
         "Le plus populaire",
-        "Économie de 29% vs 1 jour",
+        "Économie de 20% vs 1 jour",
       ],
     },
     {
       days: 15,
-      price: 45000,
-      url: "https://maketou.ci/checkout/havjob-boost-15j",
+      price: 1500,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3",
       popular: false,
       features: [
         "Visibilité maximale pendant 15 jours",
         "Apparaît en tête des résultats",
         "Badge 'Boosté' visible",
-        "Économie de 40% vs 1 jour",
+        "Économie de 50% vs 1 jour",
       ],
     },
     {
       days: 30,
-      price: 80000,
-      url: "https://maketou.ci/checkout/havjob-boost-30j",
+      price: 2000,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8-6-5",
       popular: false,
       features: [
         "Visibilité maximale pendant 30 jours",
         "Apparaît en tête des résultats",
         "Badge 'Boosté' visible",
         "Meilleur rapport qualité/prix",
-        "Économie de 47% vs 1 jour",
+        "Économie de 67% vs 1 jour",
+      ],
+    },
+  ];
+
+  const profilePlans = [
+    {
+      days: 1,
+      price: 1000,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h",
+      popular: false,
+      features: [
+        "Visibilité maximale pendant 24h",
+        "Apparaît en tête des résultats",
+        "Badge 'Boosté' visible",
+        "Idéal pour tester le système",
+      ],
+    },
+    {
+      days: 3,
+      price: 1100,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8",
+      popular: false,
+      features: [
+        "Visibilité maximale pendant 3 jours",
+        "Apparaît en tête des résultats",
+        "Badge 'Boosté' visible",
+        "Économie de 10% vs 1 jour",
+      ],
+    },
+    {
+      days: 7,
+      price: 1200,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-4",
+      popular: true,
+      features: [
+        "Visibilité maximale pendant 7 jours",
+        "Apparaît en tête des résultats",
+        "Badge 'Boosté' visible",
+        "Le plus populaire",
+        "Économie de 20% vs 1 jour",
+      ],
+    },
+    {
+      days: 15,
+      price: 1500,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8",
+      popular: false,
+      features: [
+        "Visibilité maximale pendant 15 jours",
+        "Apparaît en tête des résultats",
+        "Badge 'Boosté' visible",
+        "Économie de 50% vs 1 jour",
+      ],
+    },
+    {
+      days: 30,
+      price: 2000,
+      url: "https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8-6",
+      popular: false,
+      features: [
+        "Visibilité maximale pendant 30 jours",
+        "Apparaît en tête des résultats",
+        "Badge 'Boosté' visible",
+        "Meilleur rapport qualité/prix",
+        "Économie de 67% vs 1 jour",
       ],
     },
   ];
@@ -169,7 +234,7 @@ export default function Boost() {
             </p>
 
             <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {plans.map((plan) => (
+              {missionPlans.map((plan) => (
                 <Card
                   key={`mission-${plan.days}`}
                   className={`relative hover-elevate ${
@@ -226,7 +291,7 @@ export default function Boost() {
             </p>
 
             <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {plans.map((plan) => (
+              {profilePlans.map((plan) => (
                 <Card
                   key={`profile-${plan.days}`}
                   className={`relative hover-elevate ${
