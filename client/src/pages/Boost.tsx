@@ -4,7 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Zap, TrendingUp, Eye, Briefcase, User as UserIcon } from "lucide-react";
+import {
+  Check,
+  Zap,
+  TrendingUp,
+  Eye,
+  Briefcase,
+  User as UserIcon,
+} from "lucide-react";
 
 export default function Boost() {
   const plans = [
@@ -79,18 +86,21 @@ export default function Boost() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <div className="bg-gradient-to-b from-primary/5 to-transparent py-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full mb-6">
             <Zap className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Boostez votre visibilité</span>
+            <span className="text-sm font-medium text-primary">
+              Boostez votre visibilité
+            </span>
           </div>
           <h1 className="text-5xl font-bold text-foreground mb-6">
             Passez en première position
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Augmentez vos chances de trouver des clients ou le freelance idéal en boostant votre profil ou vos missions
+            Augmentez vos chances de trouver des clients ou le freelance idéal
+            en boostant votre profil ou vos missions
           </p>
         </div>
       </div>
@@ -102,7 +112,9 @@ export default function Boost() {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Visibilité maximale</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Visibilité maximale
+              </h3>
               <p className="text-sm text-muted-foreground">
                 Apparaissez systématiquement en tête des résultats de recherche
               </p>
@@ -116,7 +128,8 @@ export default function Boost() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Plus de vues</h3>
               <p className="text-sm text-muted-foreground">
-                Multipliez par 10 le nombre de personnes qui voient votre profil ou mission
+                Multipliez par 10 le nombre de personnes qui voient votre profil
+                ou mission
               </p>
             </CardContent>
           </Card>
@@ -151,7 +164,8 @@ export default function Boost() {
               Boostez votre mission
             </h2>
             <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Augmentez la visibilité de votre mission pour recevoir plus de candidatures de freelances qualifiés
+              Augmentez la visibilité de votre mission pour recevoir plus de
+              candidatures de freelances qualifiés
             </p>
 
             <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -207,7 +221,8 @@ export default function Boost() {
               Boostez votre profil
             </h2>
             <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Mettez en avant votre profil de freelance pour être vu par plus de clients potentiels
+              Mettez en avant votre profil de freelance pour être vu par plus de
+              clients potentiels
             </p>
 
             <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -287,9 +302,11 @@ export default function Boost() {
                 <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   3
                 </div>
-                <h4 className="font-semibold mb-2">Profitez de la visibilité</h4>
+                <h4 className="font-semibold mb-2">
+                  Profitez de la visibilité
+                </h4>
                 <p className="text-sm text-muted-foreground">
-                  Votre boost est activé immédiatement après paiement
+                  Votre boost est activé dans les 24h après paiement
                 </p>
               </div>
             </div>
