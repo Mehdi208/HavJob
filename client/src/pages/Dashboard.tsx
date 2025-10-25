@@ -33,6 +33,20 @@ export default function Dashboard() {
     enabled: !!currentUser,
   });
 
+  const { data: favorites = [] } = useQuery<any[]>({
+    queryKey: ["/api/users/me/favorites"],
+    enabled: !!currentUser,
+  });
+
+  const { data: allMissions = [] } = useQuery<Mission[]>({
+    queryKey: ["/api/missions"],
+    enabled: !!currentUser && favorites.length > 0,
+  });
+
+  const favoriteMissions = allMissions.filter(m => 
+    favorites.some(f => f.missionId === m.id)
+  );
+
   const updateMissionMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       return await apiRequest("PATCH", `/api/missions/${id}`, { status });
@@ -284,11 +298,60 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="favorites" className="space-y-4">
-            <Card className="p-12 text-center">
-              <p className="text-muted-foreground">
-                Vos missions favorites apparaîtront ici
-              </p>
-            </Card>
+            {favoriteMissions.length === 0 ? (
+              <Card className="p-12 text-center">
+                <p className="text-muted-foreground">
+                  Vos missions favorites apparaîtront ici
+                </p>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {favoriteMissions.map((mission: any) => (
+                  <Card key={mission.id} className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant={getStatusVariant(mission.status)}>
+                            {getStatusLabel(mission.status)}
+                          </Badge>
+                          {mission.isBoosted && (
+                            <Badge className="bg-gradient-to-r from-[hsl(var(--chart-4))] via-[hsl(var(--chart-5))] to-[hsl(var(--destructive))] text-destructive-foreground">
+                              <Zap className="h-3 w-3 mr-1" />
+                              Boosté
+                            </Badge>
+                          )}
+                        </div>
+                        <h3 className="font-semibold text-foreground mb-1 truncate">{mission.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{mission.description}</p>
+                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Briefcase className="h-4 w-4" />
+                            {mission.category}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4" />
+                            {mission.applicantsCount || 0} candidatures
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="text-xl font-bold text-primary">
+                          {new Intl.NumberFormat("fr-FR").format(mission.budget)} FCFA
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLocation(`/missions/${mission.id}`)}
+                          data-testid={`button-view-favorite-${mission.id}`}
+                        >
+                          Voir la mission
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

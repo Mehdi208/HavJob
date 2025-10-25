@@ -46,7 +46,7 @@ export default function MissionCard({
   });
 
   const { data: favorites = [] } = useQuery<any[]>({
-    queryKey: ["/api/favorites"],
+    queryKey: ["/api/users/me/favorites"],
     enabled: !!currentUser,
   });
 
@@ -55,16 +55,13 @@ export default function MissionCard({
   const toggleFavoriteMutation = useMutation({
     mutationFn: async () => {
       if (isFavorite) {
-        const favorite = favorites.find(f => f.missionId === id);
-        if (favorite) {
-          return await apiRequest("DELETE", `/api/favorites/${favorite.id}`);
-        }
+        return await apiRequest("DELETE", `/api/missions/${id}/favorite`);
       } else {
-        return await apiRequest("POST", "/api/favorites", { missionId: id });
+        return await apiRequest("POST", `/api/missions/${id}/favorite`);
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/me/favorites"] });
       toast({
         title: isFavorite ? "Retiré des favoris" : "Ajouté aux favoris",
         description: isFavorite ? "Mission retirée de vos favoris" : "Mission ajoutée à vos favoris",
