@@ -43,7 +43,7 @@ export interface IStorage {
     isBoosted?: boolean;
     status?: string;
     search?: string;
-  }): Promise<Mission[]>;
+  }): Promise<any[]>;
   createMission(mission: InsertMission & { clientId: string }): Promise<Mission>;
   updateMission(id: string, updates: Partial<Mission>): Promise<Mission | undefined>;
   deleteMission(id: string): Promise<boolean>;
@@ -158,7 +158,7 @@ export class DatabaseStorage implements IStorage {
     isBoosted?: boolean;
     status?: string;
     search?: string;
-  }): Promise<Mission[]> {
+  }): Promise<any[]> {
     const conditions: any[] = [];
 
     if (filters) {
@@ -207,7 +207,36 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    let query = db.select().from(missions);
+    let query = db
+      .select({
+        id: missions.id,
+        clientId: missions.clientId,
+        title: missions.title,
+        description: missions.description,
+        category: missions.category,
+        customCategory: missions.customCategory,
+        budget: missions.budget,
+        budgetType: missions.budgetType,
+        location: missions.location,
+        isRemote: missions.isRemote,
+        duration: missions.duration,
+        skillsRequired: missions.skillsRequired,
+        status: missions.status,
+        applicantsCount: missions.applicantsCount,
+        isBoosted: missions.isBoosted,
+        boostExpiresAt: missions.boostExpiresAt,
+        createdAt: missions.createdAt,
+        updatedAt: missions.updatedAt,
+        client: {
+          id: users.id,
+          fullName: users.fullName,
+          phoneNumber: users.phoneNumber,
+          avatar: users.avatar,
+          rating: users.rating,
+        },
+      })
+      .from(missions)
+      .leftJoin(users, eq(missions.clientId, users.id));
     
     if (conditions.length > 0) {
       query = query.where(and(...conditions)) as any;

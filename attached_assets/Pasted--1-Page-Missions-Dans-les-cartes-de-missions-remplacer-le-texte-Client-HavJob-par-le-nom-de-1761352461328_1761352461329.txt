@@ -1,0 +1,130 @@
+🧾 1. Page “Missions”
+
+Dans les cartes de missions, remplacer le texte “Client HavJob” par le nom de l’utilisateur qui a publié la mission (nom récupéré depuis les infos du compte).
+
+🧱 2. Page “Publier une mission”
+
+Actuellement, il existe une case à cocher “Télétravail”.
+➜ Ajouter une deuxième option “Travail sur site”.
+➜ Lorsqu’une mission est publiée avec cette option, afficher le label “Sur site” sur la carte des missions.
+
+❤️ 3. Page “Mission”
+
+Ajouter la possibilité pour un utilisateur d’ajouter une mission en favoris :
+
+L’icône (ex. cœur ou étoile) change de couleur lorsqu’elle est sélectionnée.
+
+Les missions ajoutées en favoris apparaissent dans une section “Favoris” du dashboard.
+
+👤 4. Annuaire des freelances
+
+Seuls les utilisateurs ayant rempli leurs informations freelances dans leur dashboard (section “Mon profil Freelance”) doivent apparaître dans l’annuaire.
+
+Un utilisateur n’est visible dans l’annuaire que s’il a complété cette section.
+
+🧑‍💻 5. Dashboard – Mon profil Freelance
+
+Créer une section “Mon profil Freelance” dans le dashboard (à côté de “Favoris”).
+
+Cette section doit permettre à l’utilisateur d’ajouter ou modifier :
+
+Nom et prénom
+
+Description
+
+Liste de compétences
+
+CV (upload PDF ou Word téléchargeable publiquement)
+
+Ces données doivent être affichées dans l’annuaire des freelances.
+
+⚙️ 6. Dashboard – Mes missions
+
+Dans la modification du statut d’une mission, supprimer une des deux options suivantes :
+
+“Ouverte”
+
+“Toujours d’actualité”
+(Garder seulement une des deux, car elles signifient la même chose.)
+
+🪪 7. Profil Freelance public
+
+Lorsqu’un utilisateur clique sur “Voir le profil” dans l’annuaire :
+
+Il est redirigé vers la page profil du freelance.
+
+Cette page doit afficher :
+
+Nom, description, compétences, CV (téléchargeable)
+
+Un bouton pour contacter sur WhatsApp
+
+Un bouton pour appeler directement via téléphone
+
+🎨 8. Page “Devenir Freelance”
+
+Centrer la box “Et bien d’autres domaines…” au milieu de la section.
+
+⚡ 9. Page “Booster mon profil”
+
+Les paiements des boosts se font désormais uniquement via Maketou (supprimer toutes les mentions de Chariow).
+
+Le boost est activé dans les 24h après paiement.
+
+Mettre à jour les tarifs et les liens des offres comme suit :
+
+💰 Tarifs :
+
+1 jour → 1 000 FCFA
+
+3 jours → 1 100 FCFA
+
+7 jours → 1 200 FCFA
+
+15 jours → 1 500 FCFA
+
+30 jours → 2 000 FCFA
+
+🔹 Boosts Profil :
+
+24 h → https://havjob-boost.maketou.com/fr/products/boost-24h
+
+3 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8
+
+7 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-4
+
+15 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8
+
+30 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8-6
+
+🔹 Boosts Mission :
+
+24 h → https://havjob-boost.maketou.com/fr/products/boost-24h-0
+
+3 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9
+
+7 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0
+
+15 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3
+
+30 jours → https://havjob-boost.maketou.com/fr/products/boost-24h-0-9-8-0-3-8-6-5
+
+☎️ 10. Page “Nous contacter”
+
+Mettre à jour les numéros de téléphone :
+
++225 07 69 27 53 05
+
++225 05 66 86 87 95
+
++225 07 89 60 96 72
+
+Supprimer la section “Envoyez-nous un message”.
+
+💵 11. Détails d’une mission
+
+Supprimer le symbole “$” qui s’affiche à côté du budget.
+
+🎯 Objectif global :
+
+Améliorer la cohérence des pages, enrichir les profils freelances, corriger les statuts des missions et mettre à jour les options de boost via Maketou, sans casser la base de données existante ni les liens internes.

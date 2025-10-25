@@ -169,7 +169,7 @@ export default function Missions() {
                       category={mission.category}
                       location={mission.location || "Non spécifié"}
                       postedTime={formatTimeAgo(mission.createdAt)}
-                      clientName="Client HavJob"
+                      clientName={mission.client?.fullName || "Client HavJob"}
                       applicantsCount={mission.applicantsCount || 0}
                       isBoosted={mission.isBoosted || false}
                       isRemote={mission.isRemote || false}
