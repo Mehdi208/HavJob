@@ -8,7 +8,28 @@ The application targets a mobile-first audience in Côte d'Ivoire, emphasizing a
 
 ## Recent Changes
 
-**October 25, 2025:**
+**October 25, 2025 (Latest Session):**
+- **Footer Enhancement:** Added WhatsApp link to "Méhdi Traoré" footer text (+2250789609672)
+- **FreelanceProfile Fix:** Improved review section condition to prevent rendering "0" - now uses `(freelance.reviewCount ?? 0) > 0`
+- **Filter/Search UX Improvements:**
+  - Removed "Appliquer les filtres" button - filters now auto-apply on change via useEffect
+  - Added `placeholderData: (previousData) => previousData` to missions/home queries to prevent scroll-to-top during refetch
+  - Filter selections now persist after applying (checkboxes/sliders retain state)
+- **Admin Dashboard - Test User Filtering:**
+  - Stats now exclude test/N/A users using `isTestUser()` heuristic
+  - Filters users with fullName/phoneNumber containing "test" or "n/a" (case-insensitive)
+  - Freelance listings show only real users
+- **Admin Dashboard - Manual Boost Feature:**
+  - Backend: Added POST /api/admin/boost-user/:id and POST /api/admin/boost-mission/:id endpoints
+  - Duration validation: Accepts 1, 3, 7, 15, 30 days
+  - Automatically calculates `boostExpiresAt` and sets `isBoosted` to true
+  - Protected by `isAdmin` middleware
+  - Frontend: Added boost modal with duration selector (Select component)
+  - Boost buttons on freelance and mission listings open modal
+  - Displays "Boosté" badge for already-boosted items
+  - Cache invalidation after boost ensures UI updates
+
+**October 25, 2025 (Earlier):**
 - Corrected Maketou integration URLs and pricing on Boost page
   - Separated mission boost and profile boost plans into distinct arrays
   - Updated mission boost URLs: boost-24h-0, boost-24h-0-9, boost-24h-0-9-8-0, boost-24h-0-9-8-0-3, boost-24h-0-9-8-0-3-8-6-5
