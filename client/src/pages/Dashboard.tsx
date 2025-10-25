@@ -371,7 +371,6 @@ export default function Dashboard() {
                 <SelectValue placeholder="Sélectionnez un statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="open">Ouverte</SelectItem>
                 <SelectItem value="toujours_actualite">Toujours d'actualité</SelectItem>
                 <SelectItem value="quelqu_un_retenu">Quelqu'un a été retenu</SelectItem>
                 <SelectItem value="in_progress">En cours</SelectItem>
