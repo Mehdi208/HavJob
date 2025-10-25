@@ -1,4 +1,4 @@
-import { MapPin, Clock, Star, Bookmark, Zap } from "lucide-react";
+import { MapPin, Clock, Star, Heart, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +93,7 @@ export default function MissionCard({
         onClick={(e) => {
           e.stopPropagation();
           if (!currentUser) {
-            window.location.href = "/api/login";
+            setLocation("/connexion-telephone");
           } else {
             toggleFavoriteMutation.mutate();
           }
@@ -101,7 +101,7 @@ export default function MissionCard({
         disabled={toggleFavoriteMutation.isPending}
         data-testid={`button-favorite-${id}`}
       >
-        <Bookmark className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+        <Heart className={`h-5 w-5 ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground"}`} />
       </Button>
 
       {isBoosted && (

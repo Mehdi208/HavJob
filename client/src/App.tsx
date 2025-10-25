@@ -17,6 +17,7 @@ import CGU from "@/pages/CGU";
 import Boost from "@/pages/Boost";
 import Missions from "@/pages/Missions";
 import Freelances from "@/pages/Freelances";
+import FreelanceProfile from "@/pages/FreelanceProfile";
 import Admin from "@/pages/Admin";
 import PhoneRegister from "@/pages/PhoneRegister";
 import PhoneLogin from "@/pages/PhoneLogin";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/missions" component={Missions} />
       <Route path="/publier" component={PublishMission} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/freelances/:id" component={FreelanceProfile} />
       <Route path="/freelances" component={Freelances} />
       <Route path="/inscription-telephone" component={PhoneRegister} />
       <Route path="/connexion-telephone" component={PhoneLogin} />
