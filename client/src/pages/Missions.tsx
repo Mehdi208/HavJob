@@ -66,6 +66,7 @@ export default function Missions() {
       if (!res.ok) throw new Error("Failed to fetch missions");
       return res.json();
     },
+    placeholderData: (previousData) => previousData,
   });
 
   const formatBudget = (budget: number) => {

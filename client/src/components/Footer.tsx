@@ -118,7 +118,16 @@ export default function Footer() {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 HavJob. Tous droits réservés. Propulsé par Méhdi Traoré
+            © 2025 HavJob. Tous droits réservés. Propulsé par{" "}
+            <a
+              href="https://wa.me/2250789609672"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary/80 transition-colors underline"
+              data-testid="link-developer"
+            >
+              Méhdi Traoré
+            </a>
           </p>
         </div>
       </div>

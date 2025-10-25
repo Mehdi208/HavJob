@@ -33,6 +33,18 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
   const [showOnSite, setShowOnSite] = useState(false);
   const [showBoosted, setShowBoosted] = useState(false);
 
+  useEffect(() => {
+    onFiltersChange({
+      budget,
+      categories: selectedCategories,
+      locations: selectedLocations,
+      isRemote: showRemote ? true : null,
+      isOnSite: showOnSite ? true : null,
+      isBoosted: showBoosted,
+      searchQuery: currentSearchQuery,
+    });
+  }, [budget, selectedCategories, selectedLocations, showRemote, showOnSite, showBoosted, currentSearchQuery]);
+
   const categories = [
     { name: "Développement" },
     { name: "Design" },
@@ -69,17 +81,6 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
     );
   };
 
-  const handleApplyFilters = () => {
-    onFiltersChange({
-      budget,
-      categories: selectedCategories,
-      locations: selectedLocations,
-      isRemote: showRemote ? true : null,
-      isOnSite: showOnSite ? true : null,
-      isBoosted: showBoosted,
-      searchQuery: currentSearchQuery,
-    });
-  };
 
   const handleReset = () => {
     setBudget([0, 1000000]);
@@ -231,16 +232,6 @@ export default function FilterPanel({ onFiltersChange, currentSearchQuery = "" }
           </AccordionItem>
         </Accordion>
 
-        <div className="mt-4">
-          <Button
-            className="w-full"
-            size="lg"
-            onClick={handleApplyFilters}
-            data-testid="button-apply-filters"
-          >
-            Appliquer les filtres
-          </Button>
-        </div>
       </div>
     </div>
   );
