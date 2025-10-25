@@ -7,42 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, MapPin, Star, Briefcase } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import type { User } from "@shared/schema";
 
 export default function Freelances() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [, setLocation] = useLocation();
 
-  const freelances = [
-    {
-      id: "1",
-      name: "Kouadio Jean",
-      skills: ["React", "Node.js", "TypeScript"],
-      location: "Abidjan",
-      rating: 4.8,
-      reviewCount: 24,
-      completedMissions: 18,
-      description: "Développeur full-stack avec 5 ans d'expérience dans la création d'applications web modernes.",
-    },
-    {
-      id: "2",
-      name: "Traoré Aminata",
-      skills: ["UI/UX Design", "Figma", "Adobe XD"],
-      location: "Abidjan",
-      rating: 4.9,
-      reviewCount: 31,
-      completedMissions: 25,
-      description: "Designer passionnée spécialisée dans la création d'interfaces utilisateur modernes et intuitives.",
-    },
-    {
-      id: "3",
-      name: "N'Guessan Patrick",
-      skills: ["SEO", "Content Marketing", "Google Ads"],
-      location: "Yamoussoukro",
-      rating: 4.7,
-      reviewCount: 19,
-      completedMissions: 22,
-      description: "Expert en marketing digital avec une forte expérience en SEO et stratégie de contenu.",
-    },
-  ];
+  const { data: freelances = [], isLoading } = useQuery<User[]>({
+    queryKey: ["/api/freelances"],
+  });
 
   const getInitials = (name: string) => {
     return name
@@ -54,9 +29,9 @@ export default function Freelances() {
 
   const filteredFreelances = freelances.filter(
     freelance =>
-      freelance.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      freelance.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      freelance.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (freelance.fullName && freelance.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (freelance.skills && freelance.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()))) ||
+      (freelance.bio && freelance.bio.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -95,9 +70,17 @@ export default function Freelances() {
           </p>
         </div>
 
-        {filteredFreelances.length === 0 ? (
+        {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Aucun freelance ne correspond à votre recherche</p>
+            <p className="text-muted-foreground">Chargement des freelances...</p>
+          </div>
+        ) : filteredFreelances.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              {freelances.length === 0 
+                ? "Aucun freelance avec profil complété pour le moment"
+                : "Aucun freelance ne correspond à votre recherche"}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -106,44 +89,45 @@ export default function Freelances() {
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4 mb-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarFallback className="text-lg">{getInitials(freelance.name)}</AvatarFallback>
+                      <AvatarFallback className="text-lg">{getInitials(freelance.fullName || "")}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-1">{freelance.name}</h3>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-                        <MapPin className="h-3 w-3" />
-                        {freelance.location}
-                      </div>
+                      <h3 className="font-semibold text-lg mb-1">{freelance.fullName || "Freelance"}</h3>
+                      {freelance.location && (
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                          <MapPin className="h-3 w-3" />
+                          {freelance.location}
+                        </div>
+                      )}
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">{freelance.rating}</span>
+                          <span className="text-sm font-medium">{freelance.rating || 0}</span>
                         </div>
                         <span className="text-sm text-muted-foreground">
-                          ({freelance.reviewCount} avis)
+                          ({freelance.reviewCount || 0} avis)
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {freelance.description}
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                    {freelance.bio}
                   </p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {freelance.skills.map((skill, index) => (
+                    {freelance.skills && freelance.skills.map((skill, index) => (
                       <Badge key={index} variant="secondary">
                         {skill}
                       </Badge>
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                    <Briefcase className="h-4 w-4" />
-                    {freelance.completedMissions} missions complétées
-                  </div>
-
-                  <Button className="w-full" data-testid={`button-contact-${freelance.id}`}>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => setLocation(`/freelances/${freelance.id}`)}
+                    data-testid={`button-contact-${freelance.id}`}
+                  >
                     Voir le profil
                   </Button>
                 </CardContent>

@@ -663,6 +663,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/freelances", async (req, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      
+      // Filter for freelances with completed profiles
+      const freelances = allUsers
+        .filter(user => 
+          (user.role === "freelance" || user.role === "both") &&
+          user.bio && 
+          user.bio.trim().length > 0 &&
+          user.skills && 
+          user.skills.length > 0
+        )
+        .map(({ password, ...user }) => user);
+      
+      res.send(freelances);
+    } catch (error) {
+      res.status(500).send({ error: "Erreur serveur" });
+    }
+  });
+
   app.patch("/api/users/me", isAuthenticated, async (req, res) => {
     try {
       // Don't allow updating password or id through this route
