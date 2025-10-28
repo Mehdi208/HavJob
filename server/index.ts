@@ -1,0 +1,176 @@
+import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
+
+const app = express();
+
+// Trust proxy - required for rate limiting behind reverse proxy (Replit, production)
+// This allows express-rate-limit to identify individual client IPs from X-Forwarded-For
+app.set('trust proxy', 1);
+
+// CORS configuration for mobile apps, Expo, and Rork development
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, curl)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Always allow production HavJob domain (exact match)
+    if (origin === "https://havjob.replit.app") {
+      return callback(null, true);
+    }
+
+    // Parse the origin URL to validate hostname
+    try {
+      const url = new URL(origin);
+      const hostname = url.hostname;
+
+      // Allow all Expo domains (*.exp.direct) for mobile development
+      if (hostname.endsWith(".exp.direct")) {
+        return callback(null, true);
+      }
+
+      // Allow all Rork.com domains and subdomains (strict validation)
+      if (hostname === "rork.com" || hostname.endsWith(".rork.com")) {
+        return callback(null, true);
+      }
+
+      // Allow localhost and 127.0.0.1 with any port (strict hostname check)
+      if (hostname === "localhost" || hostname === "127.0.0.1") {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // Invalid origin URL, fall through to rejection
+    }
+
+    // In development, allow all origins as fallback
+    if (process.env.NODE_ENV === "development") {
+      return callback(null, true);
+    }
+
+    // In production, reject unknown origins
+    callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// Rate limiting for API endpoints
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Trop de requêtes depuis cette adresse IP, veuillez réessayer plus tard"
+    });
+  },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login/register attempts per windowMs
+  skipSuccessfulRequests: true, // Don't count successful requests
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Trop de tentatives de connexion, veuillez réessayer dans 15 minutes"
+    });
+  },
+});
+
+// Apply rate limiters
+app.use("/api/", apiLimiter);
+app.use("/api/mobile/register", authLimiter);
+app.use("/api/mobile/login", authLimiter);
+app.use("/api/auth/register-phone", authLimiter);
+app.use("/api/auth/login-phone", authLimiter);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Session configuration
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "havjob-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: "lax",
+    },
+  })
+);
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
+    }
+  });
+
+  next();
+});
+
+(async () => {
+  const server = await registerRoutes(app);
+
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+
+    res.status(status).json({ message });
+    throw err;
+  });
+
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
+  }
+
+  // ALWAYS serve the app on the port specified in the environment variable PORT
+  // Other ports are firewalled. Default to 5000 if not specified.
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = parseInt(process.env.PORT || '5000', 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();

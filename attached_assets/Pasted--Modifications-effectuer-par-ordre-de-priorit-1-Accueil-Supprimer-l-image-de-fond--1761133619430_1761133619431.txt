@@ -1,0 +1,77 @@
+🎨 Modifications à effectuer (par ordre de priorité)
+
+1️⃣ – Accueil
+
+Supprimer l’image de fond (background image).
+
+Centrer tous les éléments pour occuper harmonieusement l’espace de l’écran d’accueil.
+
+2️⃣ – Animations
+
+Ajouter des animations d’apparition sur tout le site :
+
+Les chiffres doivent démarrer à 0 et augmenter progressivement.
+
+Les box (cards) doivent apparaître les unes après les autres, avec un léger décalage.
+
+Ajouter un effet de survol (hover) sur les cards : elles doivent légèrement s’agrandir.
+
+3️⃣ – Palette de couleurs
+Appliquer les couleurs suivantes avec cohérence :
+
+🟧 Orange (#FF7043) → déjà bien utilisé, ne pas modifier.
+
+🟫 Beige (#F7EFE4) →  à utiliser comme fond du site, à la place du blanc.
+
+🟩 Vert (#81C784) → à utiliser là où tu juges l’intégration la plus harmonieuse (boutons, accent ou validation).
+
+🔵 Bleu ciel (#1A93B8) → conserver pour le survol dans le footer.
+
+🔷 Bleu foncé (#1E3A8A) → remplacer tous les textes noirs par ce bleu.
+
+🟥 Dégradé rouge bordeaux clair et éclatant → pour les étiquettes “Boost actif”.
+
+4️⃣ – NavBar
+
+Ajouter le logo importé à gauche du texte “HavJob”.
+
+Ajouter une icône “Support” parmi les icônes déjà présentes dans la nav bar.
+
+5️⃣ – Cards d’offres
+
+Augmenter la taille :
+
+des titres,
+
+du nombre de candidatures,
+
+de la localisation et de la date.
+
+Déplacer l’icône “favoris” à droite de la localisation/date (verticalement alignée sur les 2 lignes).
+
+Agrandir légèrement l’étiquette “Boost actif” et lui appliquer une animation continue (lueur ou mouvement doux).
+
+6️⃣ – Filtres
+
+Ajouter un bouton “Appliquer les filtres” sous la partie gauche des filtres.
+
+Ajouter un filtre “Boostés” pour afficher uniquement les profils boostés.
+
+7️⃣ – Footer
+
+Créer un bouton d’accès à l’espace administrateur dans le footer.
+
+Ce bouton redirige vers un dashboard interne qui permettra de booster les utilisateurs.
+
+✅ Étapes finales
+
+Nettoie le code après les modifications (suppression des doublons CSS/JS).
+
+Vérifie que la version responsive (mobile/tablette) reste fonctionnelle.
+
+Prépare ensuite les bases pour la connexion manuelle (numéro + mot de passe).
+
+🧩 Commande finale pour Replit Agent 3
+
+« Applique toutes les modifications ci-dessus dans l’ordre indiqué.
+Lorsque tu as terminé, optimise le code et prépare la base pour ajouter les fonctionnalités de connexion et de gestion des utilisateurs selon le PRD du projet HavJob. »

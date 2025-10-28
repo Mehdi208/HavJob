@@ -1,0 +1,207 @@
+
+
+# 🧩 **HavJob – Product Requirement Document (PRD)**
+
+## 🏷️ Informations générales
+
+* **Nom du projet :** HavJob
+* **Type :** Plateforme de mise en relation (freelances, particuliers, entreprises)
+* **Objectif principal :** Permettre aux utilisateurs de **publier, rechercher et postuler à des missions** localement, sans passer par une solution de paiement interne.
+* **Monétisation :** Boost de profil et de mission via **liens externes Chariow**.
+
+---
+
+## 🧱 **Stack Technique**
+
+| Élément           | Technologie choisie                                  |
+| ----------------- | ---------------------------------------------------- |
+| Frontend          | Next.js 15 (App Router)                              |
+| Backend           | Supabase (Base de données + Auth + API REST)         |
+| Authentification  | Numéro de téléphone + mot de passe (email optionnel) |
+| Style             | TailwindCSS + shadcn/ui                              |
+| Hébergement       | Hostinger (avec déploiement via Git)                 |
+| Base de données   | PostgreSQL via Supabase                              |
+| Paiement          | Liens externes Chariow                               |
+| Gestion des états | Zustand ou Context API                               |
+| Icônes            | Lucide-react                                         |
+| Animations        | Framer Motion                                        |
+
+---
+
+## 🗂️ **Structure du Projet (Arborescence)**
+
+```
+havjob/
+│
+├── app/
+│   ├── (public)/
+│   │   ├── page.tsx                     # Page d’accueil (missions)
+│   │   ├── mission/
+│   │   │   └── [id]/page.tsx            # Détails d’une mission
+│   │   ├── profil/
+│   │   │   └── [id]/page.tsx            # Page profil utilisateur (freelance/client)
+│   │   ├── publier/
+│   │   │   └── page.tsx                 # Formulaire de publication d’une mission
+│   │   ├── connexion/
+│   │   │   └── page.tsx                 # Authentification (numéro + mot de passe)
+│   │   ├── tableau-de-bord/
+│   │   │   ├── freelance/page.tsx       # Dashboard Freelance
+│   │   │   ├── client/page.tsx          # Dashboard Client
+│   │   └── favoris/page.tsx             # Liste des favoris
+│   │
+│   ├── layout.tsx                       # Layout global
+│   ├── globals.css                      # Fichier global Tailwind
+│   └── favicon.ico
+│
+├── components/
+│   ├── ui/                              # Composants shadcn/ui
+│   ├── cards/                           # Cartes (missions, profils, favoris)
+│   ├── forms/                           # Formulaires (auth, publier mission)
+│   ├── navbar.tsx                       # Barre de navigation principale
+│   ├── footer.tsx
+│   └── icons.tsx
+│
+├── lib/
+│   ├── supabaseClient.ts                # Initialisation Supabase
+│   ├── auth.ts                          # Logique d’authentification (numéro + mdp)
+│   ├── utils.ts                         # Fonctions utilitaires globales
+│   └── constants.ts                     # Liens des Boosts Chariow & Configs
+│
+├── store/
+│   ├── userStore.ts                     # Données utilisateur (Zustand)
+│   └── missionStore.ts                  # Données missions et favoris
+│
+├── public/
+│   └── assets/                          # Logos, icônes, images par défaut
+│
+├── types/
+│   ├── mission.ts                       # Type Mission
+│   ├── user.ts                          # Type Utilisateur
+│   └── boost.ts                         # Type Boost
+│
+├── .env.local                           # Clés Supabase, API, etc.
+├── tailwind.config.ts
+├── next.config.mjs
+├── package.json
+└── README.md
+```
+
+---
+
+## ⚙️ **Modules fonctionnels**
+
+### 1. Page d’accueil
+
+* Afficher toutes les missions via un fetch Supabase (`missions` table)
+* Filtres dynamiques : catégorie, budget, délai, localisation, type de prestation
+* Favoris : via un simple toggle (icône ⭐)
+* CTA : “Publier une mission”, “Proposer mes services”
+* Cartes “Boostées” en priorité d’affichage (champs `boost_active = true`)
+
+---
+
+### 2. Authentification
+
+* Formulaire : Nom, Prénom, Numéro (obligatoire), Email (optionnel), Mot de passe
+* Auth Supabase personnalisée avec table `users` :
+
+  ```sql
+  CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone_number TEXT UNIQUE NOT NULL,
+    email TEXT,
+    password TEXT NOT NULL,
+    role TEXT CHECK (role IN ('freelance','client')) DEFAULT 'freelance',
+    created_at TIMESTAMP DEFAULT now()
+  );
+  ```
+
+---
+
+### 3. Publication de mission
+
+* Formulaire : titre, description, budget, durée, type, lieu, catégorie
+* Lien direct avec le profil utilisateur
+* Option “Booster ma mission” → lien vers Chariow :
+
+  ```js
+  const boostLinks = {
+    '1jour': 'https://ebookciv.mychariow.shop/boost-1-jour/checkout',
+    '3jours': 'https://ebookciv.mychariow.shop/boost-3-jours/checkout',
+    '7jours': 'https://ebookciv.mychariow.shop/boot-7-jours/checkout',
+    '15jours': 'https://ebookciv.mychariow.shop/boost-15-jours/checkout',
+    '30jours': 'https://ebookciv.mychariow.shop/boost-30-jours/checkout',
+  };
+  ```
+
+---
+
+### 4. Profil utilisateur
+
+* Afficher infos, réalisations, disponibilité
+* Boutons :
+
+  * “Contacter via WhatsApp”
+  * “Créer une offre”
+  * “Travailler avec ce freelance” → met à jour la mission (`status = 'attribuée'`)
+* Avis / notes après la mission (table `reviews`)
+
+---
+
+### 5. Tableau de bord
+
+* Affiche :
+
+  * Freelance : Missions reçues, en cours, terminées
+  * Client : Missions publiées, freelancers contactés
+* Statistiques de base : vues, candidatures reçues
+* Gestion favoris
+
+---
+
+### 6. Boost & Monétisation
+
+* Les boosts sont **hors-plateforme** via Chariow
+* Lorsqu’un utilisateur a acheté un boost, il peut manuellement activer son boost sur son profil ou mission (champ `boost_active = true` dans Supabase)
+
+---
+
+## 🧩 **Base de données principale (Supabase)**
+
+**Tables :**
+
+1. `users` → infos utilisateur
+2. `missions` → annonces
+3. `reviews` → avis après mission
+4. `favorites` → missions / profils sauvegardés
+5. `boosts` → suivi manuel des boosts activés
+
+---
+
+## 🧭 **Design Guidelines**
+
+* Palette principale :
+
+  * `#FF7043` (actions principales)
+  * `#1A93B8` (liens / survols)
+  * `#81C784` (succès)
+  * `#1E3A8A` (titres / textes)
+* Typographie simple (Inter ou Poppins)
+* Coins arrondis, ombres légères
+* Micro-animations Framer Motion (hover, transition)
+
+---
+
+## ✅ **Règles de développement**
+
+1. Tout le contenu (missions, utilisateurs, favoris) vient de **Supabase**.
+2. Les pages sont **Server Components** (Next.js) sauf les formulaires (Client Components).
+3. L’authentification est **locale** (numéro + mot de passe) gérée par Supabase.
+4. Aucune transaction ne passe par la plateforme.
+5. Les boosts utilisent **des liens externes Chariow**.
+6. Chaque mission attribuée disparaît automatiquement des résultats (`status = "attribuée"`).
+7. Les avis ne sont possibles **qu’après une mission terminée**.
+
+---

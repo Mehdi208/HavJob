@@ -1,0 +1,93 @@
+PROJECT: HavJob — Plateforme de mise en relation entre particuliers, freelances et entreprises pour des missions ponctuelles en Côte d’Ivoire.
+
+You are a senior full-stack engineer responsible for building the **web version** of HavJob.
+
+I have attached the following project files:
+- @PRD (Product Requirements Document)
+- @MaquetteImage
+
+### OBJECTIVE
+Develop the **web platform HavJob** according to the attached documentation and design references.  
+The platform connects freelancers, individuals, and companies who post or respond to missions.  
+
+Users can:
+- Post missions or offers.
+- Search missions using filters (category, location, budget, etc.).
+- Contact via WhatsApp or phone.
+- Boost their mission or profile using payment links (Chariow checkout URLs).
+- Manage their dashboard, profile, and missions (received, posted, completed).
+- Rate and leave feedback after each mission.
+- Log in manually using **phone + password** (email optional).
+
+---
+
+### TECHNICAL REQUIREMENTS
+
+**Frontend stack**
+- Next.js (App Router) + TypeScript + TailwindCSS  
+- Fully responsive mobile-first design (based on attached video & colors)
+- Use modern card layout (grid / responsive breakpoints)
+- Integrate icons (Lucide, HeroIcons)
+
+**Backend**
+- Supabase (PostgreSQL) used for DB + Authentication + API routes  
+- Password hashing using bcrypt  
+- Role-based users (freelance / client)
+- Secure endpoints for missions, boosts, profiles, etc.
+
+**Database**
+Use the attached StructureBD file as reference.  
+Tables: `users`, `missions`, `boosts`, `favorites`, `reviews`, `transactions`, `categories`.
+
+**Authentication**
+- Manual login via phone + password (email optional)
+- Supabase table `users` with hashed password
+- API endpoints:
+  - `/api/auth/signup`
+  - `/api/auth/signin`
+  - `/api/auth/me`
+  - `/api/auth/logout`
+- JWT or Supabase session handling
+
+**Monetization**
+Integrate Chariow payment links (no API):
+- Boost 1 jour : https://ebookciv.mychariow.shop/boost-1-jour/checkout  
+- Boost 3 jours : https://ebookciv.mychariow.shop/boost-3-jours/checkout  
+- Boost 7 jours : https://ebookciv.mychariow.shop/boot-7-jours/checkout  
+- Boost 15 jours : https://ebookciv.mychariow.shop/boost-15-jours/checkout  
+- Boost 30 jours : https://ebookciv.mychariow.shop/boost-30-jours/checkout  
+
+**UI structure**
+- Page d’accueil = page principale des missions
+- Profil utilisateur
+- Détails d’une mission
+- Tableau de bord utilisateur
+- Page de connexion / inscription
+- (Pas de page blog, pas de page communauté)
+- Footer simple + header avec recherche et bouton "Publier une mission"
+
+---
+
+### STYLE & COLORS
+- `#FF7043` → boutons principaux
+- `#1A93B8` → accents / liens
+- `#81C784` → états positifs
+- `#1E3A8A` → titres / textes forts  
+Use rounded corners, soft shadows, clean spacing, and smooth transitions.
+
+---
+
+### EXPECTED OUTPUT
+
+1. Full codebase scaffolded for Next.js + Supabase project.
+2. Auth system working (signup/login/logout with Supabase).
+3. CRUD for missions (create, list, update, delete).
+4. Boost feature (Chariow links integrated).
+5. Dashboard page for clients and freelancers.
+6. Rating system for completed missions.
+7. Fully responsive UI matching the attached design and video.
+8. Deployment-ready configuration.
+
+Please start by scaffolding the full project structure with all directories and placeholder files, following best practices for a production-grade Next.js app with Supabase backend.
+
+When structure is ready, show the proposed folder tree and wait for confirmation before coding each module.
