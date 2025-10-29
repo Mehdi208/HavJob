@@ -1,18 +1,480 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>HavJob - Plateforme de mise en relation freelance en Côte d'Ivoire</title>
-    <meta name="description" content="HavJob connecte freelances, particuliers et entreprises en Côte d'Ivoire. Publiez ou répondez à des missions dans tous les domaines : design, développement, marketing et plus encore." />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HavJob - Trouvez votre prochain Job en Côte d'Ivoire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    
-<div style="
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 1rem 5%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d5f9f;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #4a9fd8, #2d5f9f);
+            border-radius: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #2d5f9f;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #2d5f9f;
+            border: 2px solid #2d5f9f;
+            padding: 0.6rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #2d5f9f;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #ff6b42;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #e55a35;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            padding: 4rem 5% 5rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #2d5f9f;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            flex: 2;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .search-select {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-search {
+            padding: 0.8rem 2rem;
+            background: #ff6b42;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-search:hover {
+            background: #e55a35;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #ff6b42;
+            border: 2px solid #ff6b42;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #ff6b42;
+            color: white;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 5%;
+            background: #fafafa;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2rem;
+            color: #2d5f9f;
+            margin-bottom: 1rem;
+        }
+
+        .features-subtitle {
+            color: #666;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .icon-verify {
+            background: #fce4ec;
+            color: #e91e63;
+        }
+
+        .icon-speed {
+            background: #fff3e0;
+            color: #ff6b42;
+        }
+
+        .icon-secure {
+            background: #fff8e1;
+            color: #ffc107;
+        }
+
+        .feature-card h3 {
+            color: #2d5f9f;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            color: #666;
+        }
+
+        /* Categories Section */
+        .categories {
+            padding: 4rem 5%;
+            text-align: center;
+        }
+
+        .categories h2 {
+            font-size: 2rem;
+            color: #2d5f9f;
+            margin-bottom: 1rem;
+        }
+
+        .categories-subtitle {
+            color: #666;
+            margin-bottom: 3rem;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .category-card h3 {
+            color: #2d5f9f;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .category-card p {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem 5%;
+            background: #fafafa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d5f9f;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 4rem 5%;
+            text-align: center;
+            background: white;
+        }
+
+        .cta h2 {
+            font-size: 2rem;
+            color: #2d5f9f;
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .btn-cta {
+            background: #ff6b42;
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-cta:hover {
+            background: #e55a35;
+        }
+
+        /* Footer */
+        footer {
+            background: #f5f5f5;
+            padding: 3rem 5% 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto 2rem;
+        }
+
+        .footer-section h3 {
+            color: #2d5f9f;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section ul li a:hover {
+            color: #2d5f9f;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+
+        .footer-bottom a {
+            color: #ff6b42;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+  <div style="
   background-color: #fff3cd;
   color: #856404;
   text-align: center;
@@ -21,13 +483,186 @@
   font-family: sans-serif;
   line-height: 1.4;
 ">
-  🛠️ Ce site est en maintenance pour le moment.<br />
-  Les fonctionnalités seront bientôt réactivées.
+  🛠 HavJob est en maintenance pour le moment🛠<br />
+  Les fonctionnalités seront bientôt réactivées !
 </div>
+    <header>
+        <nav>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <span>HavJob</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#publier">Publier</a></li>
+                <li><a href="#missions">Missions</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <button class="btn-secondary">S'inscrire</button>
+                <button class="btn-primary">Se connecter</button>
+            </div>
+        </nav>
+    </header>
 
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Trouvez votre prochain Job en Côte d'Ivoire</h1>
+            <p>Connectez-vous avec des freelances talentueux ou découvrez des opportunités dans tous les domaines.</p>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Quel service souhaitez-vous proposer ?">
+                <select class="search-select">
+                    <option>Ville</option>
+                    <option>Abidjan</option>
+                    <option>Yamoussoukro</option>
+                    <option>Bouaké</option>
+                </select>
+                <button class="btn-search">Rechercher</button>
+            </div>
 
-    
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+            <div class="action-buttons">
+                <button class="btn-primary">Publier une mission</button>
+                <button class="btn-outline">Proposer mes services</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2>Pourquoi choisir <span style="color: #4a9fd8;">HavJob</span> ?</h2>
+        <p class="features-subtitle">La plateforme ivoirienne qui connecte les entreprises avec les meilleurs talents freelance</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon icon-verify">🎯</div>
+                <h3>Missions vérifiées</h3>
+                <p>Toutes les missions sont vérifiées pour garantir votre sécurité</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon icon-speed">⚡</div>
+                <h3>Réponse rapide</h3>
+                <p>Recevez des réponses rapidement et commencez à travailler</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon icon-secure">💰</div>
+                <h3>Paiement sécurisé</h3>
+                <p>Vos paiements sont sécurisés avec Maketou/p>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories">
+        <h2>Parcourir par catégorie</h2>
+        <p class="categories-subtitle">Découvrez des missions dans tous les domaines</p>
+        
+        <div class="categories-grid">
+            <div class="category-card">
+                <div class="category-icon" style="background: #e3f2fd; color: #2196f3;">💻</div>
+                <h3>Développement</h3>
+                <p>124 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #fce4ec; color: #e91e63;">🎨</div>
+                <h3>Design</h3>
+                <p>89 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #f3e5f5; color: #9c27b0;">📢</div>
+                <h3>Marketing</h3>
+                <p>67 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #fff8e1; color: #ffc107;">✏️</div>
+                <h3>Rédaction</h3>
+                <p>45 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #ffebee; color: #f44336;">🎥</div>
+                <h3>Vidéo</h3>
+                <p>34 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #e0f2f1; color: #009688;">📷</div>
+                <h3>Photographie</h3>
+                <p>28 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #fff3e0; color: #ff9800;">🔧</div>
+                <h3>Services</h3>
+                <p>56 missions</p>
+            </div>
+            <div class="category-card">
+                <div class="category-icon" style="background: #e8eaf6; color: #3f51b5;">👥</div>
+                <h3>Conseil</h3>
+                <p>41 missions</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #ffebee; color: #f44336;">👥</div>
+                <div class="stat-number">12,450+</div>
+                <div class="stat-label">Freelances actifs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e3f2fd; color: #2196f3;">💼</div>
+                <div class="stat-number">8,920+</div>
+                <div class="stat-label">Missions réalisées</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fff8e1; color: #ffc107;">⭐</div>
+                <div class="stat-number">4.8/5</div>
+                <div class="stat-label">Note moyenne</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e8f5e9; color: #4caf50;">📈</div>
+                <div class="stat-number">95%</div>
+                <div class="stat-label">Taux de satisfaction</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2>Prêt à commencer ?</h2>
+        <p>Connectez-vous maintenant et accédez à des milliers d'opportunités</p>
+        <button class="btn-cta">Se connecter →</button>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>HavJob</h3>
+                <p>La plateforme qui connecte freelances et entreprises en Côte d'Ivoire</p>
+            </div>
+            <div class="footer-section">
+                <h3>Pour les clients</h3>
+                <ul>
+                    <li><a href="#">Publier une mission</a></li>
+                    <li><a href="#">Trouver un freelance</a></li>
+                    <li><a href="#">Comment ça marche</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Pour les freelances</h3>
+                <ul>
+                    <li><a href="#">Trouver des missions</a></li>
+                    <li><a href="#">Devenir freelance</a></li>
+                    <li><a href="#">Booster mon profil</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">Centre d'aide</a></li>
+                    <li><a href="#">Nous contacter</a></li>
+                    <li><a href="#">Conditions d'utilisation</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 HavJob. Tous droits réservés. Propulsé par <a href="wa.me/2250789609672">Méhdi Traoré</a></p>
+        </div>
+    </footer>
+</body>
 </html>
